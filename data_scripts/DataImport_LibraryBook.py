@@ -3,7 +3,7 @@ import csv
 import os
 
 # Oracle connection
-connection_string = "booksmart_user/booksmart_user_2019@booksmrt.cdttst4n9hrp.us-east-1.rds.amazonaws.com:1521/booksmrt"
+connection_string = "/@booksmrt.cdttst4n9hrp.us-east-1.rds.amazonaws.com:1521/booksmrt"
 con = cx_Oracle.connect(connection_string)
 cur = con.cursor()
 
