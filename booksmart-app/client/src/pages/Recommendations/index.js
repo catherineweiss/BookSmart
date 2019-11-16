@@ -9,7 +9,7 @@ class Recommendations extends Component {
     }
 
     callAPI() {
-        fetch("/recommendations/hardcover-fiction/10")
+        fetch("/recommendations/Hardcover Fiction/10")
             .then(res => res.json())
             .then(data => this.setState({ recommendations: data }))
             .catch(err => err);
