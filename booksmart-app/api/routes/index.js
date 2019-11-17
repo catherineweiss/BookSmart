@@ -168,7 +168,8 @@ router.get('/inventory/:start/:end/:num', function(req, res, next) {
                     )
                WHERE ROWNUM < :num
             ) CC
-            WHERE LB.bib_num = CC.bib_num`;
+            WHERE LB.bib_num = CC.bib_num
+            ORDER BY checkout_count DESC`;
 
             const binds = [startDate, endDate, num];
             const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
