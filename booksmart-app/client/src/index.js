@@ -9,11 +9,12 @@ import "assets/demo/demo.css";
 
 import 'index.css';
 
-import App from 'App';
 import LandingPage from "views/booksmart/LandingPage.js";
 import Index from "views/Index.js";
 import LibrarianDashboard from "views/booksmart/librarian/LibrarianDashboard"
-import ReaderDashboard from "views/booksmart/reader/reader-dashboard";
+import ReaderDashboard from "views/booksmart/reader/ReaderDashboard";
+import RecommendationsPage from "views/booksmart/reader/Recommendations"
+import InventoryManager from "views/booksmart/librarian/InventoryManager";
 
 import * as serviceWorker from './serviceWorker';
 
@@ -24,7 +25,8 @@ ReactDOM.render(
                 <Route path="/index" render={props => <LandingPage {...props} />} />
                 <Route path="/librarian-dashboard" render={props => <LibrarianDashboard/>} />
                 <Route path="/reader-dashboard" render={props => <ReaderDashboard/>} />
-                <Route path="/recommendations-page" render={props => <App/>} />
+                <Route path="/inventory-manager" render={props => <InventoryManager/>} />
+                <Route path="/recommendations" render={props => <RecommendationsPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />
                 <Redirect to="/index" />
                 <Redirect from="/" to="/index" />
