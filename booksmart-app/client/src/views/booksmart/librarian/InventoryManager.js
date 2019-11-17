@@ -1,15 +1,12 @@
-import React from "react";
+import React from 'react';
+import InventoryManager from "components/InventoryManager";
 
-// core components
-
-function InventoryManager() {
+function InventoryManagerPage() {
     return (
-        <>
-            <div className="section section-examples" data-background-color="black">
-                <h4>Inventory Manager</h4>
-            </div>
-        </>
+        <div className="App">
+            <InventoryManager/>
+        </div>
     );
 }
 
-export default InventoryManager;
+export default InventoryManagerPage;

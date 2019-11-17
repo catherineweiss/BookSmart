@@ -14,7 +14,7 @@ import Index from "views/Index.js";
 import LibrarianDashboard from "views/booksmart/librarian/LibrarianDashboard"
 import ReaderDashboard from "views/booksmart/reader/ReaderDashboard";
 import RecommendationsPage from "views/booksmart/reader/Recommendations"
-import InventoryManager from "views/booksmart/librarian/InventoryManager";
+import InventoryManagerPage from "views/booksmart/librarian/InventoryManager";
 
 import * as serviceWorker from './serviceWorker';
 
@@ -25,7 +25,7 @@ ReactDOM.render(
                 <Route path="/index" render={props => <LandingPage {...props} />} />
                 <Route path="/librarian-dashboard" render={props => <LibrarianDashboard/>} />
                 <Route path="/reader-dashboard" render={props => <ReaderDashboard/>} />
-                <Route path="/inventory-manager" render={props => <InventoryManager/>} />
+                <Route path="/inventory-manager" render={props => <InventoryManagerPage/>} />
                 <Route path="/recommendations" render={props => <RecommendationsPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />
                 <Redirect to="/index" />
