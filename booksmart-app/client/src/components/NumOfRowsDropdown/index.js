@@ -1,44 +1,51 @@
-import React from "react";
+import React, { Component } from "react";
 
 // reactstrap components
 import {
-    Button,
-    ButtonGroup,
     DropdownToggle,
     DropdownMenu,
     DropdownItem,
     UncontrolledDropdown
 } from "reactstrap";
 
-function NumOfRowsDropdown(){
-    return (
-        <>
-            <UncontrolledDropdown>
-                <DropdownToggle
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    caret
-                    color="secondary"
-                    data-toggle="dropdown"
-                    id="dropdownMenuButton"
-                    type="button"
-                >
-                    Num of Results
-                </DropdownToggle>
-                <DropdownMenu aria-labelledby="dropdownMenuButton">
-                    <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
-                        25
-                    </DropdownItem>
-                    <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
-                        50
-                    </DropdownItem>
-                    <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
-                        100
-                    </DropdownItem>
-                </DropdownMenu>
-            </UncontrolledDropdown>
-        </>
-    );
+class NumOfRowsDropdown extends Component{
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const {children, ...attributes} = this.props;
+
+        return (
+            <>
+                <UncontrolledDropdown>
+                    <DropdownToggle
+                        aria-expanded={false}
+                        aria-haspopup={true}
+                        caret
+                        color="primary"
+                        data-toggle="dropdown"
+                        id="dropdownMenuButton"
+                        type="button"
+                    >
+                        {this.props.numOfResults}
+                    </DropdownToggle>
+                    <DropdownMenu aria-labelledby="dropdownMenuButton">
+                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="25">
+                            25
+                        </DropdownItem>
+                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="50">
+                            50
+                        </DropdownItem>
+                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="100">
+                            100
+                        </DropdownItem>
+                    </DropdownMenu>
+                </UncontrolledDropdown>
+            </>
+        );
+    }
 }
 
 export default NumOfRowsDropdown;

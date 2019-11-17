@@ -5,35 +5,49 @@ import NumOfRowsDropdown from "components/NumOfRowsDropdown";
 // reactstrap components
 import {
     Button,
-    FormGroup,
     Container,
     Row,
     Col
 } from "reactstrap";
+import moment from "moment";
 
 class InventoryManager extends Component {
     constructor(props) {
         super(props);
         this.callAPI = this.callAPI.bind(this);
-        this.state = { inventory: [] };
+        this.state = { inventory: [], startDate: moment(), endDate: new moment(), numOfResults: 25 };
     }
 
     callAPI() {
-        // startDate/endDate/numberOfRecords
-        fetch("/inventory/2013-01-02/2013-08-02/100")
+        const startDate = this.state.startDate.format("YYYY-MM-DD");
+        const endDate = this.state.endDate.format("YYYY-MM-DD");
+        const numOfResults = this.state.numOfResults;
+
+        console.log(startDate);
+        console.log(endDate);
+        console.log(numOfResults);
+        const url = "/inventory/"+startDate+"/"+endDate+"/"+numOfResults;
+
+        fetch(url)
             .then(res => res.json())
             .then(data => this.setState({ inventory: data }))
             .catch(err => err);
     }
 
+    onChangeStartDate = date => this.setState({ startDate: date });
+    onChangeEndDate = date => this.setState({ endDate:date });
+
+
+    onChangeNumOfResults(event) {
+        this.setState({ numOfResults: event.target.value });
+    }
+
     componentDidMount() {
-        this.callAPI();
-        console.log(this.state.inventory);
     }
 
     render() {
         const inventory = this.state.inventory.map( (inventory, index) => {
-            return <Row id="result-row">
+            return <Row key={index}>
                 <Col md="8">
                     <p>{inventory.TITLE}</p>
                 </Col>
@@ -59,12 +73,12 @@ class InventoryManager extends Component {
                                     <Row>
                                         <Col md="6">
                                             <div className="datepicker-container">
-                                                <FormGroup>
                                                     <Datetime
                                                         timeFormat={false}
                                                         inputProps={{ placeholder: "Start Date" }}
+                                                        onChange={this.onChangeStartDate}
+                                                        value={this.state.startDate}
                                                     />
-                                                </FormGroup>
                                             </div>
                                         </Col>
                                     </Row>
@@ -74,12 +88,12 @@ class InventoryManager extends Component {
                                     <Row>
                                         <Col md="6">
                                             <div className="datepicker-container">
-                                                <FormGroup>
                                                     <Datetime
                                                         timeFormat={false}
                                                         inputProps={{ placeholder: "End Date" }}
+                                                        onChange={this.onChangeEndDate}
+                                                        value={this.state.endDate}
                                                     />
-                                                </FormGroup>
                                             </div>
                                         </Col>
                                     </Row>
@@ -91,9 +105,21 @@ class InventoryManager extends Component {
                                     <Row>
                                         <Col md="6">
                                             <div className="num-of-rows-dropdown">
-                                                <FormGroup>
-                                                    <NumOfRowsDropdown/>
-                                                </FormGroup>
+                                                    <NumOfRowsDropdown handleClick={this.onChangeNumOfResults.bind(this)} numOfResults={this.state.numOfResults}/>
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col md="6">
+                                    <Row>
+                                        <Col md="6">
+                                            <div className="submit">
+                                                <Button
+                                                    className="btn-round"
+                                                    color="primary"
+                                                    href="#"
+                                                    onClick={this.callAPI}
+                                                    >Search</Button>
                                             </div>
                                         </Col>
                                     </Row>
