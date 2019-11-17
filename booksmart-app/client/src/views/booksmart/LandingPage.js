@@ -75,7 +75,7 @@ function LandingPage() {
                                             className="rounded img-fluid img-raised"
                                             src={require("assets/image/librarian.jpg")}
                                         ></img>
-                                        <a href="/librarian">
+                                        <a href="/librarian-dashboard">
                                             <h4 className="title">Librarian</h4>
                                         </a>
                                     </div>
@@ -87,7 +87,7 @@ function LandingPage() {
                                             className="rounded img-fluid img-raised"
                                             src={require("assets/image/reader.jpg")}
                                         ></img>
-                                        <a href="reader">
+                                        <a href="reader-dashboard">
                                             <h4 className="title">Reader</h4>
                                         </a>
                                     </div>
