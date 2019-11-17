@@ -127,7 +127,7 @@ router.get('/inventory/:start/:end/:num', function(req, res, next) {
     const end = req.params.end;
     const num = req.params.num;
 
-    console.log("In here really: "+start+", "+end+", "+num);
+    console.log("Inventory params: "+start+", "+end+", "+num);
 
     async function init(start, end, num) {
         try {
