@@ -44,6 +44,9 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+/**
+ * Recommendations
+ */
 router.get('/recommendations/:list/:num', function(req, res, next) {
   const list = req.params.list;
   const num = req.params.num;
@@ -93,7 +96,7 @@ router.get('/recommendations/:list/:num', function(req, res, next) {
       const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
       const result = await conn.execute(query, binds, options);
 
-      // console.log(result.rows);
+       console.log(result.rows);
       return result.rows;
 
     } catch (err) {
@@ -113,6 +116,84 @@ router.get('/recommendations/:list/:num', function(req, res, next) {
   init(list, num).then(result => res.json(result));
 
   // res.render('index', { data: "Hi" });
-})
+});
+
+
+/**
+ * Inventory Manager
+ */
+router.get('/inventory/:start/:end/:num', function(req, res, next) {
+    const start = req.params.start;
+    const end = req.params.end;
+    const num = req.params.num;
+
+    console.log("Inventory params: "+start+", "+end+", "+num);
+
+    async function init(start, end, num) {
+        try {
+            // Create a connection pool which will later be accessed via the
+            // pool cache as the 'default' pool.
+            await oracledb.createPool(config);
+            console.log('Connection pool started');
+
+            // Now the pool is running, it can be used
+            const rows = await getInventory(start, end, num);
+            // console.log(rows);
+            return rows;
+
+        } catch (err) {
+            console.error('init() error: ' + err.message);
+        } finally {
+            await closePool();
+        }
+    };
+
+    async function getInventory (startDate, endDate, num) {
+        let conn;
+
+        try {
+            conn = await oracledb.getConnection();
+            const query =
+                `SELECT LB.bib_num, LB.title, LB.item_count, CC.checkout_count FROM
+            LibraryBook LB,
+            (
+               SELECT *
+               FROM (
+                        SELECT bib_num, COUNT(id) AS checkout_count
+                        FROM LibraryCheckout_2
+                         WHERE checkout_date >= TO_DATE(:startDate, 'YYYY-MM-DD')
+                           AND checkout_date <= TO_DATE(:endDate, 'YYYY-MM-DD')
+                        GROUP BY bib_num
+                        ORDER BY checkout_count DESC
+                    )
+               WHERE ROWNUM < :num
+            ) CC
+            WHERE LB.bib_num = CC.bib_num
+            ORDER BY checkout_count DESC`;
+
+            const binds = [startDate, endDate, num];
+            const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+            const result = await conn.execute(query, binds, options);
+
+            console.log(result.rows);
+            return result.rows;
+
+        } catch (err) {
+            console.error('Ouch!', err)
+        } finally {
+            if (conn) { // conn assignment worked, need to close
+                try {
+                    await conn.close();
+                    console.log("Closing connection...");
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    init(start, end, num).then(result => res.json(result));
+});
+
 
 module.exports = router;

@@ -11,3 +11,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.librarian-dashboard {
+  max-width: 300px;
+  max-height: 200px;
+}
+
+.reader-dashboard {
+  max-width: 300px;
+  max-height: 200px;
+}
+
+.submit {
+  margin-top: 70px;
+}
