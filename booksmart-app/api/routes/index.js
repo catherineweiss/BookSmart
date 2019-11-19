@@ -195,5 +195,90 @@ router.get('/inventory/:start/:end/:num', function(req, res, next) {
     init(start, end, num).then(result => res.json(result));
 });
 
+/**
+ * Librarian Tool: Book Display Planner
+ */
+router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, next) {
+  const list = req.params.list;
+  const year = req.params.year;
+  const numTimes = req.params.numTimes;
+  const numDisplay = req.params.numDisplay;
+
+  console.log("Book Display params: "+list+", "+year+", "+numTimes+", "+numDisplay);
+
+  async function init(list, year, numTimes, numDisplay) {
+      try {
+          // Create a connection pool which will later be accessed via the
+          // pool cache as the 'default' pool.
+          await oracledb.createPool(config);
+          console.log('Connection pool started');
+
+          // Now the pool is running, it can be used
+          const rows = await getBooksToDisplay(list, year, numTimes, numDisplay);
+          // console.log(rows);
+          return rows;
+
+      } catch (err) {
+          console.error('init() error: ' + err.message);
+      } finally {
+          await closePool();
+      }
+  };
+
+  async function getBooksToDisplay (listName, year, numTimes, numDisplay) {
+      let conn;
+
+      try {
+          conn = await oracledb.getConnection();
+          const query =
+              `WITH BESTSELLING_AUTHORS_ON_LIST AS(
+                SELECT AB2.AUTHOR_ID
+                FROM NYT_AUTHOR_BOOK_3 AB2 JOIN
+                    NYT_BOOK_LIST BL2 ON (BL2.ISBN13 = AB2.ISBN13) JOIN
+                    NYT_BESTSELLER BS2 ON (BS2.ENTRY_ID = BL2.ENTRY_ID)
+                WHERE BS2.LIST_NAME = :listName
+                GROUP BY AB2.AUTHOR_ID
+                HAVING COUNT(*) > :numTimes
+             ),
+             SELECTION AS(
+                SELECT *
+                FROM NYT_BESTSELLER BS
+                    JOIN NYT_BOOK_LIST BL ON (BS.ENTRY_ID = BL.ENTRY_ID)
+                    JOIN NYT_BOOK BK ON (BK.ISBN13 = BL.ISBN13)
+                    JOIN NYT_AUTHOR_BOOK_3 AB ON (BK.ISBN13 = AB.ISBN13)
+                    JOIN NYT_AUTHOR_3 A ON (A.AUTHOR_ID = AB.AUTHOR_ID)
+                WHERE A.AUTHOR_ID IN (SELECT * FROM BESTSELLING_AUTHORS_ON_LIST)
+             )
+             SELECT S.TITLE, S.NAME, S.ISBN13, COUNT(UNIQUE LC.ID) AS NUM_CHECKOUTS
+             FROM SELECTION S JOIN
+                LIBRARYISBN LI ON (S.ISBN13 = LI.ISBN) JOIN
+                LIBRARYCHECKOUT_2 LC ON (LI.BIB_NUM = LC.BIB_NUM)
+             WHERE EXTRACT(YEAR FROM CHECKOUT_DATE) = :year
+             GROUP BY S.TITLE, S.NAME, S.ISBN13
+             ORDER BY NUM_CHECKOUTS DESC`;
+
+          const binds = [listName, year, numTimes, numDisplay];
+          const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+          const result = await conn.execute(query, binds, options);
+
+          console.log(result.rows);
+          return result.rows;
+
+      } catch (err) {
+          console.error('Ouch!', err)
+      } finally {
+          if (conn) { // conn assignment worked, need to close
+              try {
+                  await conn.close();
+                  console.log("Closing connection...");
+              } catch (err) {
+                  console.error(err);
+              }
+          }
+      }
+  }
+
+  init(list, year, numTimes, numDisplay).then(result => res.json(result));
+});
 
 module.exports = router;
