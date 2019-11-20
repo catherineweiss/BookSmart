@@ -8,7 +8,7 @@ import {
     UncontrolledDropdown
 } from "reactstrap";
 
-class NumOfRowsDropdown extends Component{
+class YearDropdown extends Component{
 
     constructor(props) {
         super(props);
@@ -29,7 +29,7 @@ class NumOfRowsDropdown extends Component{
                         id="dropdownMenuButton"
                         type="button"
                     >
-                        {this.props.numOfResults}
+                        {this.props.year}
                     </DropdownToggle>
                     <DropdownMenu aria-labelledby="dropdownMenuButton">
                         <DropdownItem onClick={this.props.handleClick.bind(this)} value="2017">
@@ -54,4 +54,4 @@ class NumOfRowsDropdown extends Component{
     }
 }
 
-export default NumOfRowsDropdown;
+export default YearDropdown;

@@ -8,7 +8,7 @@ import {
     UncontrolledDropdown
 } from "reactstrap";
 
-class NumOfRowsDropdown extends Component{
+class BestsellerListsDropdown extends Component{
 
     constructor(props) {
         super(props);
