@@ -17,7 +17,7 @@ class DisplayPlanner extends Component {
     constructor(props) {
         super(props);
         this.callAPI = this.callAPI.bind(this);
-        this.state = { bookdisplay: [], listName: 'name of list ', year: 'year ', numTimes: 'number ', numOfResults: '25 ' };
+        this.state = { bookdisplay: [], listName: 'name of list ', year: '  year  ', numTimes: ' number ', numOfResults: '25 ' };
     }
 
     callAPI() {
@@ -85,7 +85,7 @@ class DisplayPlanner extends Component {
                         <Col md="12">
                             <Row id="inventory-date">
                                 <Col md="4">
-                                    <h5>Choose a Bestseller List</h5>
+                                    <h5>Choose a NYT Bestseller List</h5>
                                     <Row>
                                         <Col md="4">
                                             <div className="bestseller-lists-dropdown">
@@ -117,7 +117,7 @@ class DisplayPlanner extends Component {
                             </Row>
                             <Row id="num-of-rows">
                                 <Col md="6">
-                                    <h4>Num of results</h4>
+                                    <h5>Number of results</h5>
                                     <Row>
                                         <Col md="6">
                                             <div className="num-of-rows-dropdown">
