@@ -198,15 +198,15 @@ router.get('/inventory/:start/:end/:num', function(req, res, next) {
 /**
  * Librarian Tool: Book Display Planner
  */
-router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, next) {
+router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', function(req, res, next) {
   const list = req.params.list;
-  const year = req.params.year;
   const numTimes = req.params.numTimes;
+  const year = req.params.year;
   const numDisplay = req.params.numDisplay;
 
   console.log("Book Display params: " + list + ", " + numTimes + ", " + year + ", " + numDisplay);
 
-  async function init(list, year, numTimes, numDisplay) {
+  async function init(list, numTimes, year, numDisplay) {
       try {
           // Create a connection pool which will later be accessed via the
           // pool cache as the 'default' pool.
@@ -214,7 +214,7 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
           console.log('Connection pool started');
 
           // Now the pool is running, it can be used
-          const rows = await getBooksToDisplay(list, year, numTimes, numDisplay);
+          const rows = await getBooksToDisplay(list, numTimes, year, numDisplay);
           // console.log(rows);
           return rows;
 
@@ -225,7 +225,7 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
       }
   };
 
-  async function getBooksToDisplay (listName, numTimes, year, numDisplay) {
+  async function getBooksToDisplay (list, numTimes, year, numDisplay) {
       let conn;
 
       try {
@@ -236,11 +236,11 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
                 FROM (SELECT NBL.ISBN13 AS ISBN13
                       FROM NYT_BESTSELLER BS1
                                JOIN NYT_BOOK_LIST NBL on BS1.ENTRY_ID = NBL.ENTRY_ID
-                      WHERE BS1.LIST_NAME = :listName
+                      WHERE BS1.LIST_NAME = :list
                       GROUP BY NBL.ISBN13) ISBNs
                          JOIN NYT_AUTHOR_BOOK_3 AB1 ON ISBNs.ISBN13 = AB1.ISBN13
                 GROUP BY AB1.AUTHOR_ID
-                HAVING COUNT(*) > :numTimes
+                HAVING COUNT(*) >= :numTimes
             ), SELECTION AS (
             SELECT BS.LIST_NAME, BK.ISBN13, BK.TITLE, A.AUTHOR_ID, A.NAME
             FROM NYT_BESTSELLER BS
@@ -258,14 +258,14 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
                          JOIN
                      LIBRARYCHECKOUT_2 LC ON (LI.BIB_NUM = LC.BIB_NUM)
                 WHERE EXTRACT(YEAR FROM CHECKOUT_DATE) = :year
-                GROUP BY S.TITLE, S.NAME, S.ISBN13
+                GROUP BY S.TITLE, S.NAME
                 ORDER BY NUM_CHECKOUTS DESC
             )
             SELECT R.TITLE, R.NAME, R.NUM_CHECKOUTS
             FROM RESULTS R
-            WHERE ROWNUM <= :numDisplay;`;
+            WHERE ROWNUM <= :numDisplay`;
 
-          const binds = [listName, numTimes, year, numDisplay];
+          const binds = [list, numTimes, year, numDisplay];
           const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
           const result = await conn.execute(query, binds, options);
 
@@ -286,7 +286,7 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
       }
   }
 
-  init(listName, numTimes, year, numDisplay).then(result => res.json(result));
+  init(list, numTimes, year, numDisplay).then(result => res.json(result));
 });
 
 module.exports = router;

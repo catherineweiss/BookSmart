@@ -32,21 +32,6 @@ class NumOfTimesDropdown extends Component{
                         {this.props.numTimes}
                     </DropdownToggle>
                     <DropdownMenu aria-labelledby="dropdownMenuButton">
-                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="10">
-                            10
-                        </DropdownItem>
-                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="9">
-                            9
-                        </DropdownItem>
-                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="8">
-                            8
-                        </DropdownItem>
-                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="7">
-                            7
-                        </DropdownItem>
-                        <DropdownItem onClick={this.props.handleClick.bind(this)} value="6">
-                            6
-                        </DropdownItem>
                         <DropdownItem onClick={this.props.handleClick.bind(this)} value="5">
                             5
                         </DropdownItem>
