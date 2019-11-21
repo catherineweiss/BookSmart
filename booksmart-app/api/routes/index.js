@@ -204,7 +204,7 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
   const numTimes = req.params.numTimes;
   const numDisplay = req.params.numDisplay;
 
-  console.log("Book Display params: "+list+", "+year+", "+numTimes+", "+numDisplay);
+  console.log("Book Display params: " + list + ", " + numTimes + ", " + year + ", " + numDisplay);
 
   async function init(list, year, numTimes, numDisplay) {
       try {
@@ -225,39 +225,47 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
       }
   };
 
-  async function getBooksToDisplay (listName, year, numTimes, numDisplay) {
+  async function getBooksToDisplay (listName, numTimes, year, numDisplay) {
       let conn;
 
       try {
           conn = await oracledb.getConnection();
           const query =
-              `WITH BESTSELLING_AUTHORS_ON_LIST AS(
-                SELECT AB2.AUTHOR_ID
-                FROM NYT_AUTHOR_BOOK_3 AB2 JOIN
-                    NYT_BOOK_LIST BL2 ON (BL2.ISBN13 = AB2.ISBN13) JOIN
-                    NYT_BESTSELLER BS2 ON (BS2.ENTRY_ID = BL2.ENTRY_ID)
-                WHERE BS2.LIST_NAME = :listName
-                GROUP BY AB2.AUTHOR_ID
+              `WITH BESTSELLING_AUTHORS_ON_LIST AS (
+                SELECT AB1.AUTHOR_ID
+                FROM (SELECT NBL.ISBN13 AS ISBN13
+                      FROM NYT_BESTSELLER BS1
+                               JOIN NYT_BOOK_LIST NBL on BS1.ENTRY_ID = NBL.ENTRY_ID
+                      WHERE BS1.LIST_NAME = :listName
+                      GROUP BY NBL.ISBN13) ISBNs
+                         JOIN NYT_AUTHOR_BOOK_3 AB1 ON ISBNs.ISBN13 = AB1.ISBN13
+                GROUP BY AB1.AUTHOR_ID
                 HAVING COUNT(*) > :numTimes
-             ),
-             SELECTION AS(
-                SELECT *
-                FROM NYT_BESTSELLER BS
-                    JOIN NYT_BOOK_LIST BL ON (BS.ENTRY_ID = BL.ENTRY_ID)
-                    JOIN NYT_BOOK BK ON (BK.ISBN13 = BL.ISBN13)
-                    JOIN NYT_AUTHOR_BOOK_3 AB ON (BK.ISBN13 = AB.ISBN13)
-                    JOIN NYT_AUTHOR_3 A ON (A.AUTHOR_ID = AB.AUTHOR_ID)
-                WHERE A.AUTHOR_ID IN (SELECT * FROM BESTSELLING_AUTHORS_ON_LIST)
-             )
-             SELECT S.TITLE, S.NAME, S.ISBN13, COUNT(UNIQUE LC.ID) AS NUM_CHECKOUTS
-             FROM SELECTION S JOIN
-                LIBRARYISBN LI ON (S.ISBN13 = LI.ISBN) JOIN
-                LIBRARYCHECKOUT_2 LC ON (LI.BIB_NUM = LC.BIB_NUM)
-             WHERE EXTRACT(YEAR FROM CHECKOUT_DATE) = :year
-             GROUP BY S.TITLE, S.NAME, S.ISBN13
-             ORDER BY NUM_CHECKOUTS DESC`;
+            ), SELECTION AS (
+            SELECT BS.LIST_NAME, BK.ISBN13, BK.TITLE, A.AUTHOR_ID, A.NAME
+            FROM NYT_BESTSELLER BS
+                   JOIN NYT_BOOK_LIST BL ON (BS.ENTRY_ID = BL.ENTRY_ID)
+                   JOIN NYT_BOOK BK ON (BK.ISBN13 = BL.ISBN13)
+                   JOIN NYT_AUTHOR_BOOK_3 AB ON (BK.ISBN13 = AB.ISBN13)
+                   JOIN NYT_AUTHOR_3 A ON (A.AUTHOR_ID = AB.AUTHOR_ID)
+            WHERE A.AUTHOR_ID IN (SELECT * FROM BESTSELLING_AUTHORS_ON_LIST)
+            GROUP BY BK.ISBN13, BS.LIST_NAME, BK.TITLE, A.AUTHOR_ID, A.NAME
+            ), RESULTS AS (
+                SELECT DISTINCT(S.TITLE) AS TITLE, S.NAME, COUNT(UNIQUE LC.ID) AS NUM_CHECKOUTS
+                FROM SELECTION S
+                         JOIN
+                     LIBRARYISBN LI ON (S.ISBN13 = LI.ISBN)
+                         JOIN
+                     LIBRARYCHECKOUT_2 LC ON (LI.BIB_NUM = LC.BIB_NUM)
+                WHERE EXTRACT(YEAR FROM CHECKOUT_DATE) = :year
+                GROUP BY S.TITLE, S.NAME, S.ISBN13
+                ORDER BY NUM_CHECKOUTS DESC
+            )
+            SELECT R.TITLE, R.NAME, R.NUM_CHECKOUTS
+            FROM RESULTS R
+            WHERE ROWNUM <= :numDisplay;`;
 
-          const binds = [listName, year, numTimes, numDisplay];
+          const binds = [listName, numTimes, year, numDisplay];
           const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
           const result = await conn.execute(query, binds, options);
 
@@ -278,7 +286,7 @@ router.get('/bookdisplay/:list/:year/:numTimes/:numDisplay', function(req, res, 
       }
   }
 
-  init(list, year, numTimes, numDisplay).then(result => res.json(result));
+  init(listName, numTimes, year, numDisplay).then(result => res.json(result));
 });
 
 module.exports = router;
