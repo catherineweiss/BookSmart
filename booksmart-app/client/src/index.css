@@ -25,3 +25,32 @@ code {
 .submit {
   margin-top: 70px;
 }
+
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card-col {
+  display: flex;
+}
+
+.card-book-image {
+  max-height: 300px;
+  max-width: 400px;
+}
+
+.card-book {
+  width: 400px;
+  height: 700px;
+}
+
+.card-title-font {
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.card-text-font {
+  font-size: 90%;
+  margin: unset;
+}
