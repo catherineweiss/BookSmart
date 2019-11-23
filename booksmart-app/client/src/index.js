@@ -13,7 +13,7 @@ import LandingPage from "views/booksmart/LandingPage.js";
 import Index from "views/Index.js";
 import LibrarianDashboard from "views/booksmart/librarian/LibrarianDashboard"
 import ReaderDashboard from "views/booksmart/reader/ReaderDashboard";
-import RecommendationsPage from "views/booksmart/reader/Recommendations"
+import BestsellersPage from "views/booksmart/reader/Bestsellers"
 import InventoryManagerPage from "views/booksmart/librarian/InventoryManager";
 
 import * as serviceWorker from './serviceWorker';
@@ -26,7 +26,7 @@ ReactDOM.render(
                 <Route path="/librarian-dashboard" render={props => <LibrarianDashboard/>} />
                 <Route path="/reader-dashboard" render={props => <ReaderDashboard/>} />
                 <Route path="/inventory-manager" render={props => <InventoryManagerPage/>} />
-                <Route path="/recommendations" render={props => <RecommendationsPage/>} />
+                <Route path="/bestsellers" render={props => <BestsellersPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />
                 <Redirect to="/index" />
                 <Redirect from="/" to="/index" />

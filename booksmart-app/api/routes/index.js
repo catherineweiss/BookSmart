@@ -45,9 +45,9 @@ router.get('/', function(req, res, next) {
 });
 
 /**
- * Recommendations
+ * Bestsellers
  */
-router.get('/recommendations/:list/:num', function(req, res, next) {
+router.get('/bestsellers/:list/:num', function(req, res, next) {
   const list = req.params.list;
   const num = req.params.num;
 
@@ -59,7 +59,7 @@ router.get('/recommendations/:list/:num', function(req, res, next) {
       console.log('Connection pool started');
 
       // Now the pool is running, it can be used
-      const rows = await getRecommendations(list, num);
+      const rows = await getBestsellers(list, num);
       // console.log(rows);
       return rows;
 
@@ -70,7 +70,7 @@ router.get('/recommendations/:list/:num', function(req, res, next) {
     }
   };
 
-  async function getRecommendations (list, num) {
+  async function getBestsellers (list, num) {
     let conn;
 
     try {
@@ -96,7 +96,7 @@ router.get('/recommendations/:list/:num', function(req, res, next) {
       const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
       const result = await conn.execute(query, binds, options);
 
-       console.log(result.rows);
+      console.log(result.rows);
       return result.rows;
 
     } catch (err) {
@@ -115,7 +115,57 @@ router.get('/recommendations/:list/:num', function(req, res, next) {
 
   init(list, num).then(result => res.json(result));
 
-  // res.render('index', { data: "Hi" });
+});
+
+router.get('/bestsellers/getlists', function(req, res, next) {
+
+  async function init() {
+    try {
+      // Create a connection pool which will later be accessed via the
+      // pool cache as the 'default' pool.
+      await oracledb.createPool(config);
+      console.log('Connection pool started');
+
+      // Now the pool is running, it can be used
+      const rows = await getNYTimesLists();
+      // console.log(rows);
+      return rows;
+
+    } catch (err) {
+      console.error('init() error: ' + err.message);
+    } finally {
+      await closePool();
+    }
+  };
+
+  async function getNYTimesLists () {
+    let conn;
+
+    try {
+      conn = await oracledb.getConnection();
+      const query = "SELECT LIST_NAME FROM NYT_LIST ORDER BY LIST_NAME";
+      const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+      const result = await conn.execute(query, [], options);
+
+      console.log(result.rows);
+      return result.rows;
+
+    } catch (err) {
+      console.error('Ouch!', err)
+    } finally {
+      if (conn) { // conn assignment worked, need to close
+        try {
+          await conn.close();
+          console.log("Closing connection...");
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+  }
+
+  init().then(result => res.json(result));
+
 });
 
 
