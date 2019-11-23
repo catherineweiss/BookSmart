@@ -30,7 +30,6 @@ ReactDOM.render(
                 <Route path="/inventory-manager" render={props => <InventoryManagerPage/>} />
                 <Route path="/display-planner" render={props => <DisplayPlannerPage/>} />
                 <Route path="/book-background" render={props => <BookBackgroundPage/>} />
-                <Route path="/recommendations" render={props => <RecommendationsPage/>} />
                 <Route path="/bestsellers" render={props => <BestsellersPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />
                 <Redirect to="/index" />
