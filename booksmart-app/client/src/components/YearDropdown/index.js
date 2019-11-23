@@ -10,13 +10,7 @@ import {
 
 class YearDropdown extends Component{
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        const {children, ...attributes} = this.props;
-
         return (
             <>
                 <UncontrolledDropdown>
