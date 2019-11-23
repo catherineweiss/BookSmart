@@ -294,4 +294,114 @@ router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', function(req, res, 
   init(list, numTimes, year, numDisplay).then(result => res.json(result));
 });
 
+/**
+ * Reader Dashboard - Book Background
+ *
+ * Examples: harry potter and the sorcerer, hunger games, fault in our stars, alchemist, kite runner, girl with the dragon tattoo
+ */
+router.get('/bookbackground/:title', function(req, res, next) {
+    const title = req.params.title;
+
+    console.log("Book background params: "+title);
+
+    async function init(title) {
+        try {
+            // Create a connection pool which will later be accessed via the
+            // pool cache as the 'default' pool.
+            await oracledb.createPool(config);
+            console.log('Connection pool started');
+
+            if(!title || title.trim() === '') {
+                return;
+            }
+
+            // Now the pool is running, it can be used
+            const titleInput = '%'+title.toLowerCase()+'%';
+            const rows = await getBookBackground(titleInput);
+            // console.log(rows);
+            return rows;
+
+        } catch (err) {
+            console.error('init() error: ' + err.message);
+        } finally {
+            await closePool();
+        }
+    };
+
+    async function getBookBackground (title) {
+        let conn;
+
+        try {
+            conn = await oracledb.getConnection();
+            const query =
+                `SELECT LB_NYT.*, GRB.AVERAGE_RATING, GRB.RATINGS_COUNT, GRB.IMAGE_URL, GRB.SMALL_IMAGE_URL, GRB.PUBLICATION_YEAR
+         FROM (
+         SELECT LB_Result.*,
+                NB.DESCRIPTION         AS DESCRIPTION,
+                NB.AMAZON_PRODUCT_URL  AS PRODUCT_URL,
+                NB.BOOK_IMAGE_WIDTH,
+                NB.BOOK_IMAGE_HEIGHT,
+                NB.BOOK_IMAGE,
+                MIN(NBS.RANK)          AS MIN_RANK,
+                MAX(NBS.WEEKS_ON_LIST) AS MAX_WEEKS_ON_LIST
+         FROM (
+                  SELECT AVG_CC.*, LI.ISBN
+                  FROM (SELECT LC.BIB_NUM AS BIB_NUM, LB.TITLE AS TITLE, CEIL(COUNT(LC.id) / 5) AS AVG_CHECKOUT_PER_YEAR
+                        FROM LIBRARYBOOK LB,
+                             LibraryCheckout_2 LC,
+                             LibraryItemCode LIC1,
+                             LibraryItemCode LIC2
+                        WHERE LB.BIB_NUM = LC.BIB_NUM
+                          AND lower(LB.TITLE) like :title
+                          AND LIC1.code = LC.item_collection
+                          AND LIC2.code = LC.item_type
+                          AND LIC1.genre_name != 'NA'
+                          AND LIC2.genre_name != 'NA'
+                        GROUP BY LC.bib_num, LB.title) AVG_CC
+                           LEFT JOIN LIBRARYISBN LI
+                                     ON AVG_CC.BIB_NUM = LI.BIB_NUM
+                                         AND LI.ISBN_TYPE = 'ISBN13'
+              ) LB_Result
+                  LEFT JOIN NYT_BOOK NB
+                            ON NB.ISBN13 = LB_Result.ISBN
+                  LEFT JOIN NYT_BOOK_LIST NBL
+                            ON NB.ISBN13 = NBL.ISBN13
+                  LEFT JOIN NYT_BESTSELLER NBS
+                            ON NBS.ENTRY_ID = NBL.ENTRY_ID
+                  LEFT JOIN NYT_LIST NL
+                            ON NL.LIST_NAME = NBS.LIST_NAME
+         GROUP BY LB_Result.BIB_NUM, LB_Result.TITLE, LB_Result.AVG_CHECKOUT_PER_YEAR, LB_Result.ISBN,
+                  NB.DESCRIPTION, NB.AMAZON_PRODUCT_URL, NB.BOOK_IMAGE_WIDTH, NB.BOOK_IMAGE_HEIGHT, NB.BOOK_IMAGE
+         ) LB_NYT
+         LEFT JOIN GOODREADSISBN GRI
+                   ON LB_NYT.ISBN = GRI.ISBN13
+         LEFT JOIN GOODREADSBOOK GRB
+                   ON GRB.GOODREADS_ID = GRI.GOODREADS_ID
+         ORDER BY MIN_RANK ASC`;
+
+            const binds = [title];
+            const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+            const result = await conn.execute(query, binds, options);
+
+            console.log(result.rows);
+            return result.rows;
+
+        } catch (err) {
+            console.error('Ouch!', err)
+        } finally {
+            if (conn) { // conn assignment worked, need to close
+                try {
+                    await conn.close();
+                    console.log("Closing connection...");
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    init(title).then(result => res.json(result));
+});
+
+
 module.exports = router;

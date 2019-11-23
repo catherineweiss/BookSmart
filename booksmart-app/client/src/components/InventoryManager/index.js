@@ -68,7 +68,7 @@ class InventoryManager extends Component {
             </Row>
         });
 
-        if(this.state.inventory.length != 0) {
+        if(this.state.inventory.length !== 0) {
             results =
              <Row id="results">
                 <Col md="12">
