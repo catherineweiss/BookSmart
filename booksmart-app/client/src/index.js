@@ -13,7 +13,7 @@ import LandingPage from "views/booksmart/LandingPage.js";
 import Index from "views/Index.js";
 import LibrarianDashboard from "views/booksmart/librarian/LibrarianDashboard"
 import ReaderDashboard from "views/booksmart/reader/ReaderDashboard";
-import BestsellersPage from "views/booksmart/reader/Bestsellers"
+import BestsellersPage from "views/booksmart/Bestsellers"
 import InventoryManagerPage from "views/booksmart/librarian/InventoryManager";
 
 import * as serviceWorker from './serviceWorker';
