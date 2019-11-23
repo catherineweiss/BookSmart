@@ -72,11 +72,11 @@ function ReaderDashboard() {
                         <Col md="6">
                             <Row>
                                 <Col sm="12" md={{ size: 6, offset: 3 }}>
-                                    <a href="/favorites" target="_blank">
+                                    <a href="/greatbooks" target="_blank">
                                         <img
                                             alt="..."
                                             className="img-raised reader-dashboard"
-                                            src={require("assets/image/favorites.jpg")}
+                                            src={require("assets/image/stack1.jpg")}
                                         ></img>
                                     </a>
                                 </Col>
@@ -86,11 +86,11 @@ function ReaderDashboard() {
                                     <Button
                                         className="btn-round"
                                         color="default"
-                                        to="/favorites"
+                                        to="/greatbooks"
                                         outline
                                         tag={Link}
                                     >
-                                        Favorites
+                                        Great Books You've Never Heard Of
                                     </Button>
                                 </Col>
                             </Row>
