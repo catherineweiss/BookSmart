@@ -76,7 +76,7 @@ function LibrarianDashboard() {
                                         <img
                                             alt="..."
                                             className="img-raised librarian-dashboard"
-                                            src={require("assets/image/planner.jpeg")}
+                                            src={require("assets/image/BookstoreBookDisplay700x400.jpg")}
                                         ></img>
                                     </a>
                                 </Col>

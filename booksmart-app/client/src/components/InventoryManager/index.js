@@ -46,6 +46,8 @@ class InventoryManager extends Component {
     }
 
     render() {
+        let results;
+
         const inventory = this.state.inventory.map( (inventory, index) => {
             return <Row key={index}>
                 <Col md="8">
@@ -53,14 +55,48 @@ class InventoryManager extends Component {
                 </Col>
 
                 <Col md="2">
+                    <p>{inventory.GENRE}</p>
+                </Col>
+
+                <Col md="1">
                     <p>{inventory.ITEM_COUNT}</p>
                 </Col>
 
-                <Col md="2">
+                <Col md="1">
                     <p>{inventory.CHECKOUT_COUNT}</p>
                 </Col>
             </Row>
         });
+
+        if(this.state.inventory.length != 0) {
+            results =
+             <Row id="results">
+                <Col md="12">
+                    <Row id="result-header">
+                        <Col md="8">
+                            <h5>Title</h5>
+                        </Col>
+
+                        <Col md="2">
+                            <h5>Genre</h5>
+                        </Col>
+
+                        <Col md="1">
+                            <h5>Item Count</h5>
+                        </Col>
+
+                        <Col md="1">
+                            <h5>Checkout Count</h5>
+                        </Col>
+                    </Row>
+                    {inventory}
+                </Col>
+            </Row>;
+        }
+        else {
+            results = '';
+        }
+
         return (
             <div>
                 <Container>
@@ -128,24 +164,7 @@ class InventoryManager extends Component {
                         </Col>
                     </Row>
                     <div className="space-50"></div>
-                    <Row id="results">
-                        <Col md="12">
-                            <Row id="result-header">
-                                <Col md="8">
-                                    <h5>Title</h5>
-                                </Col>
-
-                                <Col md="2">
-                                    <h5>Item Count</h5>
-                                </Col>
-
-                                <Col md="2">
-                                    <h5>Checkout Count</h5>
-                                </Col>
-                            </Row>
-                            {inventory}
-                        </Col>
-                    </Row>
+                    {results}
                 </Container>
             </div>
         );
