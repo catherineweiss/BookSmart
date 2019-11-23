@@ -154,21 +154,26 @@ router.get('/inventory/:start/:end/:num', function(req, res, next) {
         try {
             conn = await oracledb.getConnection();
             const query =
-                `SELECT LB.bib_num, LB.title, LB.item_count, CC.checkout_count FROM
-            LibraryBook LB,
+                `SELECT LB.bib_num, LB.title, LIC.genre_name as GENRE, LB.item_count, CC.checkout_count FROM
+            LibraryBook LB, LibraryItemCode LIC,
             (
                SELECT *
                FROM (
-                        SELECT bib_num, COUNT(id) AS checkout_count
-                        FROM LibraryCheckout_2
-                         WHERE checkout_date >= TO_DATE(:startDate, 'YYYY-MM-DD')
-                           AND checkout_date <= TO_DATE(:endDate, 'YYYY-MM-DD')
-                        GROUP BY bib_num
+                        SELECT LC2.bib_num, COUNT(LC2.id) AS checkout_count
+                        FROM LibraryCheckout_2 LC2 , LibraryItemCode LIC1, LibraryItemCode LIC2
+                        WHERE LIC1.code = LC2.item_collection
+                            AND LIC2.code = LC2.item_type
+                            AND LC2.checkout_date >= TO_DATE(:startDate, 'YYYY-MM-DD')
+                            AND LC2.checkout_date <= TO_DATE(:endDate, 'YYYY-MM-DD')
+                            AND LIC1.genre_name != 'NA'
+                            AND LIC2.genre_name != 'NA'
+                        GROUP BY LC2.bib_num                            
                         ORDER BY checkout_count DESC
                     )
                WHERE ROWNUM < :num
             ) CC
             WHERE LB.bib_num = CC.bib_num
+                AND LB.item_collection = LIC.code
             ORDER BY checkout_count DESC`;
 
             const binds = [startDate, endDate, num];
