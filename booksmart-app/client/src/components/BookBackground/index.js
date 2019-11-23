@@ -8,11 +8,9 @@ import {
     Container,
     Row,
     Col,
-    CardGroup,
     Card,
     CardBody,
     CardTitle,
-    CardFooter,
     CardText,
     CardImg
 } from "reactstrap";
