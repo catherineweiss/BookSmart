@@ -297,7 +297,7 @@ router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', function(req, res, 
 /**
  * Reader Dashboard - Book Background
  *
- * Examples: harry potter and the sorcerer, hunger games, fault in our stars, alchemist, kite runner, girl with the dragon tattoo
+ * Examples: harry potter and the , girl with the dragon tattoo, hunger games, alchemist, fault in our stars, kite runner
  */
 router.get('/bookbackground/:title', function(req, res, next) {
     const title = req.params.title;

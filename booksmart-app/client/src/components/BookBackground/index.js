@@ -7,7 +7,14 @@ import {
     Button,
     Container,
     Row,
-    Col
+    Col,
+    CardGroup,
+    Card,
+    CardBody,
+    CardTitle,
+    CardFooter,
+    CardText,
+    CardImg
 } from "reactstrap";
 
 class BookBackground extends Component {
@@ -46,49 +53,32 @@ class BookBackground extends Component {
         let results;
 
         const bookBackground = this.state.bookBackground.map( (bookBackground, index) => {
-            return <Row key={index}>
-                <Col md="6">
-                    <p>{bookBackground.TITLE}</p>
+            return <Col md="4" className="card-col" key={index}>
+                    <Card className="card-book">
+                        <CardImg variant="top" src={bookBackground.BOOK_IMAGE? bookBackground.BOOK_IMAGE: require("assets/image/bs-logo.png")} className="card-book-image"/>
+                        <CardBody>
+                            <CardTitle className="card-title-font">{bookBackground.TITLE}</CardTitle>
+                            <CardText>
+                                {bookBackground.DESCRIPTION}
+                            </CardText>
+                            <p className="card-text-font">Average Checkout per year: {bookBackground.AVG_CHECKOUT_PER_YEAR}</p>
+                            <p className="card-text-font">New York Times Best Ranking: {bookBackground.MIN_RANK}</p>
+                            <p className="card-text-font">Maximum # of weeks on New York Times Best Seller List: {bookBackground.MAX_WEEKS_ON_LIST}</p>
+                            <p className="card-text-font">Average Rating: {bookBackground.AVERAGE_RATING}</p>
+                            <p className="card-text-font">Ratings Count: {bookBackground.RATINGS_COUNT}</p>
+                            <p className="card-text-font">Publication Year: {bookBackground.PUBLICATION_YEAR}</p>
+                        </CardBody>
+                    </Card>
                 </Col>
-
-                <Col md="1">
-                    <p>{bookBackground.AVG_CHECKOUT_PER_YEAR}</p>
-                </Col>
-
-                <Col md="1">
-                    <p>{bookBackground.MIN_RANK}</p>
-                </Col>
-
-                <Col md="4">
-                    <p>{bookBackground.DESCRIPTION}</p>
-                </Col>
-            </Row>
         });
 
         if(this.state.bookBackground.length !== 0) {
             results =
-                <Row id="results">
-                    <Col md="12">
-                        <Row id="result-header">
-                            <Col md="6">
-                                <h5>Title</h5>
-                            </Col>
-
-                            <Col md="1">
-                                <h5>Average Checkouts Per Year</h5>
-                            </Col>
-
-                            <Col md="1">
-                                <h5>Minimum Rank</h5>
-                            </Col>
-
-                            <Col md="4">
-                                <h5>Description</h5>
-                            </Col>
-                        </Row>
+                <Container>
+                    <Row className="card-row">
                         {bookBackground}
-                    </Col>
-                </Row>;
+                    </Row>
+                </Container>
         }
         else {
             results = '';
