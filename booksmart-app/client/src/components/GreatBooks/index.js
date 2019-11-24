@@ -94,14 +94,11 @@ class GreatBooks extends Component {
                         </Col>
 
                         <Col md="4">
-                            <div>Image should go here, but is not displaying</div>
-                            <div
-                                className="image-container"
-                                style={{
-                                    backgroundImage:
-                                        "url(" + require("assets/image/stack3.jpg") + ")"
-                                }}
-                            ></div>
+                            <div><img
+                                alt="..."
+                                className="img-raised librarian-dashboard"
+                                src={require("assets/image/stack3.jpg")}
+                            ></img></div>
                         </Col>
 
                         <Col md="12">    
