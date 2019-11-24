@@ -88,7 +88,7 @@ class NotReadBooks extends Component {
         return (
             <div>
                 <Container>
-                    <h3 className="title">Books You Have Never Heard Of</h3>
+                    <h3 className="title">What People Are Not Reading</h3>
                     <Row id="notReadBooks">
                         <Col md="12">
                             <Row id="input">
