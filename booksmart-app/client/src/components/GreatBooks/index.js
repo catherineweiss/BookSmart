@@ -45,10 +45,10 @@ class GreatBooks extends Component {
     render() {
         const books = this.state.books.map( (books, index) => {
             return <Row key={index}>
-                <Col md="8">
+                <Col md="9">
                     <p>{books.TITLE}</p>
                 </Col>
-                <Col md="4">
+                <Col md="3">
                     <p>{books.NUM_CHECKOUTS}</p>
                 </Col>
             </Row>
