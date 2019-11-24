@@ -532,11 +532,10 @@ router.get('/notreadbooks/:year', function(req, res, next) {
   * Reader Tool: Great Books You've Never Heard Of
  */
 router.get('/greatbooks/:genre/:num', function(req, res, next) {
-  const start = req.params.start;
-  const end = req.params.end;
+  const genre = req.params.genre;
   const num = req.params.num;
 
-  console.log("Inventory params: "+genre+", "+num);
+  console.log("Great Books params: "+genre+", "+num);
 
   async function init(genre, num) {
       try {
@@ -546,7 +545,7 @@ router.get('/greatbooks/:genre/:num', function(req, res, next) {
           console.log('Connection pool started');
 
           // Now the pool is running, it can be used
-          const rows = await getInventory(genre, num);
+          const rows = await getGreatBooks(genre, num);
           // console.log(rows);
           return rows;
 
@@ -557,33 +556,30 @@ router.get('/greatbooks/:genre/:num', function(req, res, next) {
       }
   };
 
-  async function getInventory (genre, num) {
+  async function getGreatBooks (genre, num) {
       let conn;
 
       try {
           conn = await oracledb.getConnection();
           const query =
               `WITH GENRE_SELECTION AS (
-                SELECT LC2.BIB_NUM AS BIB_NUM, LB2.TITLE AS TITLE, LI2.ISBN AS ISBN, LC2.ID AS ID
-                FROM LIBRARYCHECKOUT LC2
-                        JOIN LIBRARYBOOK LB2 ON LC2.BIB_NUM = LB2.BIB_NUM
-                        JOIN LIBRARYISBN LI2 ON LC2.BIB_NUM = LI2.BIB_NUM
-                        JOIN LIBRARYITEMCODE LIC2 ON LB2.ITEM_COLLECTION = LIC2.CODE
-                WHERE LIC2.GENRE_NAME = :genre OR LIC2.SUB_GENRE_NAME = :genre
+                SELECT LC2.BIB_NUM, LB2.TITLE, LI2.ISBN, LC2.ID AS CHECKOUT_ID
+                FROM LIBRARYCHECKOUT_2 LC2
+                    JOIN LIBRARYBOOK LB2 ON LC2.BIB_NUM = LB2.BIB_NUM
+                    JOIN LIBRARYISBN LI2 ON LC2.BIB_NUM = LI2.BIB_NUM
+                    JOIN LIBRARYITEMCODE LIC2 ON LB2.ITEM_COLLECTION = LIC2.CODE
+                WHERE LIC2.GENRE_NAME = :genre
+            ), LIB_BOOKS_ON_NYT_LISTS AS (
+                SELECT LI3.BIB_NUM
+                FROM NYT_BOOK NB JOIN LIBRARYISBN LI3 ON NB.ISBN13 = LI3.ISBN
             )
-            SELECT *
-            FROM
-            (SELECT COUNT(GS.ID) AS NUM_CHECKOUTS, GS.BIB_NUM, GS.TITLE
-            FROM GENRE_SELECTION GS
-            WHERE GS.BIB_NUM NOT IN
-                (SELECT GS2.BIB_NUM
-                FROM GENRE_SELECTION GS2
-                    JOIN LIBRARYISBN LI2 ON GS2.BIB_NUM = LI2.BIB_NUM
-                    JOIN NYT_BOOK_LIST NBL2 ON LI2.ISBN = NBL2.ISBN13
-                )
-            GROUP BY GS.BIB_NUM, GS.TITLE
-            ORDER BY NUM_CHECKOUTS DESC)
-            WHERE ROWNUM <= :num`;
+            SELECT TITLE, NUM_CHECKOUTS
+            FROM (SELECT GS.TITLE, COUNT(GS.CHECKOUT_ID) AS NUM_CHECKOUTS, GS.BIB_NUM
+                  FROM GENRE_SELECTION GS
+                  WHERE GS.BIB_NUM NOT IN (SELECT BIB_NUM FROM LIB_BOOKS_ON_NYT_LISTS)
+                  GROUP BY GS.BIB_NUM, GS.TITLE
+                  ORDER BY NUM_CHECKOUTS DESC)
+            WHERE ROWNUM <= :num `;
 
           const binds = [genre, num];
           const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };

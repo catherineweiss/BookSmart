@@ -72,7 +72,7 @@ function ReaderDashboard() {
                         <Col md="6">
                             <Row>
                                 <Col sm="12" md={{ size: 6, offset: 3 }}>
-                                    <a href="/greatbooks" target="_blank">
+                                    <a href="/great-books" target="_blank">
                                         <img
                                             alt="..."
                                             className="img-raised reader-dashboard"
@@ -86,7 +86,7 @@ function ReaderDashboard() {
                                     <Button
                                         className="btn-round"
                                         color="default"
-                                        to="/greatbooks"
+                                        to="/great-books"
                                         outline
                                         tag={Link}
                                     >
