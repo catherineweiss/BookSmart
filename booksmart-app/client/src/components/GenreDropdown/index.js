@@ -23,7 +23,7 @@ class GenreDropdown extends Component{
                         id="dropdownMenuButton"
                         type="button"
                     >
-                        {this.props.numOfResults}
+                        {this.props.genre}
                     </DropdownToggle>
                     <DropdownMenu aria-labelledby="dropdownMenuButton">
                         <DropdownItem onClick={this.props.handleClick.bind(this)} value="Childrens">
