@@ -57,19 +57,23 @@ class GreatBooks extends Component {
             <div>
                 <Container>
                     <h3 className="title">Great Books You've Never Heard Of</h3> 
-                    <div>Wondering what to suggest for your next book club selection?</div>
-                    <div>Need to pick out a book for a person who has "read everything"?</div>
-                    <div>This Reader Tool is for you! Find books that were not New York Times bestsellers, yet 
-                        racked up the most library checkouts for a particular genre.  
-                    </div>
-                    <div className="space-50"></div>
                     <Row id="inputs-to-display">
-                        <Col md="12">
-                            <Row id="listSelection">
-                                <Col md="5">
+                        <Col md="8">
+                            <Row>
+                                <Col md="12">
+                                    <div>Wondering what to suggest for your next book club selection?</div>
+                                    <div>Need to pick out a book for a person who has "read everything"?</div>
+                                    <div>This Reader Tool is for you! Find books that were not New York Times</div>
+                                    <div>bestsellers, yet racked up the most library checkouts for a particular genre.</div>
+                                    <div className="space-50"></div>
+                                </Col>
+                            </Row>
+
+                            <Row id="genreSelection">
+                                <Col md="6">
                                     <h5>Choose a Genre:</h5>
                                 </Col>
-                                <Col md="7">
+                                <Col md="6">
                                     <div className="genre-dropdown">
                                         <GenreDropdown handleClick={this.onChangeGenre.bind(this)} genre={this.state.genre}/>
                                     </div> 
@@ -77,17 +81,30 @@ class GreatBooks extends Component {
                             </Row>
 
                             <Row id="num-of-rows">
-                                <Col md="5">
+                                <Col md="6">
                                     <h5>How many results would you like to display?</h5>
                                 </Col>
-                                <Col md="7">
+                                <Col md="6">
                                     <div className="num-of-rows-dropdown">
                                         <NumOfRowsDropdown handleClick={this.onChangeNumOfResults.bind(this)} numOfResults={this.state.numOfResults}/>
                                     </div>
                                 </Col>
                             </Row>
 
-                            
+                        </Col>
+
+                        <Col md="4">
+                            <div>Image should go here, but is not displaying</div>
+                            <div
+                                className="image-container"
+                                style={{
+                                    backgroundImage:
+                                        "url(" + require("assets/image/stack3.jpg") + ")"
+                                }}
+                            ></div>
+                        </Col>
+
+                        <Col md="12">    
                             <Row id="submit">
                                 <Col md="12">
                                     <div className="submit">
@@ -102,6 +119,7 @@ class GreatBooks extends Component {
                             </Row>
                         </Col>
                     </Row>
+
                     <Row id="results">
                         <Col md="12"> <h4>Here are your book ideas:</h4>
                             <Row id="result-header">
