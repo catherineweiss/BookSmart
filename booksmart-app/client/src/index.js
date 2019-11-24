@@ -16,6 +16,7 @@ import ReaderDashboard from "views/booksmart/reader/ReaderDashboard";
 import BestsellersPage from "views/booksmart/Bestsellers"
 import InventoryManagerPage from "views/booksmart/librarian/InventoryManager";
 import DisplayPlannerPage from "views/booksmart/librarian/DisplayPlanner";
+import NotReadBooksPage from "views/booksmart/librarian/NotReadBooks";
 import BookBackgroundPage from "views/booksmart/reader/BookBackground";
 
 import * as serviceWorker from './serviceWorker';
@@ -29,6 +30,7 @@ ReactDOM.render(
                 <Route path="/reader-dashboard" render={props => <ReaderDashboard/>} />
                 <Route path="/inventory-manager" render={props => <InventoryManagerPage/>} />
                 <Route path="/display-planner" render={props => <DisplayPlannerPage/>} />
+                <Route path="/not-read-books" render={props => <NotReadBooksPage/>} />
                 <Route path="/book-background" render={props => <BookBackgroundPage/>} />
                 <Route path="/bestsellers" render={props => <BestsellersPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />

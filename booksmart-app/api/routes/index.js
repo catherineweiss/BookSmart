@@ -453,5 +453,79 @@ router.get('/bookbackground/:title', function(req, res, next) {
     init(title).then(result => res.json(result));
 });
 
+/**
+ * Librarian Dashboard - Book People Are Not Borrowing
+ *
+ */
+router.get('/notreadbooks/:year', function(req, res, next) {
+    const year = req.params.year;
+
+    console.log("Not Read books params: "+year);
+
+    async function init(year) {
+        try {
+            // Create a connection pool which will later be accessed via the
+            // pool cache as the 'default' pool.
+            await oracledb.createPool(config);
+            console.log('Connection pool started');
+
+            // Now the pool is running, it can be used
+            const rows = await getNeverReadBooks(year);
+
+            return rows;
+
+        } catch (err) {
+            console.error('init() error: ' + err.message);
+        } finally {
+            await closePool();
+        }
+    };
+
+    async function getNeverReadBooks (year) {
+        let conn;
+
+        try {
+            conn = await oracledb.getConnection();
+            const query =
+                `SELECT *
+        FROM (
+         SELECT DISTINCT(LB.TITLE) AS TITLE, LA.NAME AS AUTHOR,  LC2.GENRE_NAME AS GENRE, LI.ISBN
+         FROM LibraryBook LB
+                  JOIN LibraryISBN LI on LI.BIB_NUM = LB.BIB_NUM AND LI.ISBN_TYPE = 'ISBN13'
+                  JOIN LibraryItemCode LC1 on LB.ITEM_COLLECTION = LC1.CODE AND LC1.GENRE_NAME != 'NA'
+                  JOIN LibraryItemCode LC2 on LB.ITEM_TYPE = LC2.CODE AND LC2.GENRE_NAME != 'NA'
+                  JOIN LibraryBookAuthor LBA on LBA.BIB_NUM = LB.BIB_NUM
+                  JOIN LibraryAuthor LA on LA.ID = LBA.AUTHOR_ID
+         WHERE LI.ISBN NOT IN (SELECT LI2.ISBN
+                               FROM LibraryCheckout_2 LC2
+                                        JOIN LIBRARYISBN LI2 ON LI2.BIB_NUM = LC2.BIB_NUM
+                               WHERE EXTRACT(YEAR FROM LC2.CHECKOUT_DATE) = :year)
+         ORDER BY DBMS_RANDOM.VALUE()
+         )
+        WHERE ROWNUM <= 25`;
+
+            const binds = [year];
+            const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+            const result = await conn.execute(query, binds, options);
+
+            console.log(result.rows);
+            return result.rows;
+
+        } catch (err) {
+            console.error('Ouch!', err)
+        } finally {
+            if (conn) { // conn assignment worked, need to close
+                try {
+                    await conn.close();
+                    console.log("Closing connection...");
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    init(year).then(result => res.json(result));
+});
 
 module.exports = router;
