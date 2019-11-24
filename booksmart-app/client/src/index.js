@@ -17,6 +17,7 @@ import BestsellersPage from "views/booksmart/Bestsellers"
 import InventoryManagerPage from "views/booksmart/librarian/InventoryManager";
 import DisplayPlannerPage from "views/booksmart/librarian/DisplayPlanner";
 import BookBackgroundPage from "views/booksmart/reader/BookBackground";
+import RecommendationsPage from "views/booksmart/reader/Recommendations"
 
 import * as serviceWorker from './serviceWorker';
 
