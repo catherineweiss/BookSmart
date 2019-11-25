@@ -39,7 +39,7 @@ class Bestsellers extends Component {
     render() {
       const leftWidth = 2;
       const midWidth = 1;
-      const rightWidth = 9;
+
       const bestsellers = this.state.bestsellers.map( (bs, index) => {
           // return <tr key={ index }><td>{bs.TITLE}</td><td>{bs.DESCRIPTION}</td></tr>
           return <Row key={index}>

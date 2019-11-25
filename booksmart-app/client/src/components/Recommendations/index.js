@@ -46,7 +46,7 @@ class Recommendations extends Component {
     render() {
       const leftWidth = 2;
       const midWidth = 1;
-      const rightWidth = 9;
+
       const recommendations = this.state.recommendations.map( (rec, index) => {
           return <Row key={index}>
               <Col>
