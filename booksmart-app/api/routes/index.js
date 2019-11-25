@@ -528,4 +528,112 @@ router.get('/notreadbooks/:year', function(req, res, next) {
     init(year).then(result => res.json(result));
 });
 
+/**
+ * Recommendations
+ */
+router.get('/recommendations/:title/:num', function(req, res, next) {
+  const titleInput = `%${req.params.title.toUpperCase()}%`;
+  const numTitles = req.params.num;
+
+  async function init(titleInput, numTitles) {
+    try {
+      // Create a connection pool which will later be accessed via the
+      // pool cache as the 'default' pool.
+      await oracledb.createPool(config);
+      console.log('Connection pool started');
+
+      // Now the pool is running, it can be used
+      const rows = await getRecommendations(titleInput, numTitles);
+      // console.log(rows);
+      return rows;
+
+    } catch (err) {
+      console.error('init() error: ' + err.message);
+    } finally {
+      await closePool();
+    }
+  };
+
+  async function getRecommendations (titleInput, numTitles) {
+    let conn;
+    try {
+      conn = await oracledb.getConnection();
+      const query =
+      `WITH TargetBook AS (
+        SELECT *
+        FROM GOODREADSBOOK
+        WHERE UPPER(title) LIKE :titleInput
+      ),
+      TargetISBNsAndRatings AS (
+        SELECT GI.ISBN as ISBN, TB.AVERAGE_RATING as RATING
+        FROM TargetBook TB JOIN GOODREADSISBN GI ON (TB.GOODREADS_ID = GI.GOODREADS_ID)
+        UNION
+        SELECT GI.ISBN13 as ISBN, TB.AVERAGE_RATING as RATING
+        FROM TargetBook TB JOIN GOODREADSISBN GI ON (TB.GOODREADS_ID = GI.GOODREADS_ID)
+      ),
+      TargetLibraryBooks AS (
+         SELECT *
+         FROM TargetISBNsAndRatings TB, LIBRARYISBN LI, LIBRARYBOOK LB, LIBRARYITEMCODE LIC
+         WHERE TB.ISBN = LI.ISBN
+           AND LI.BIB_NUM = LB.BIB_NUM
+           AND LB.ITEM_COLLECTION = LIC.CODE
+      ),
+      TargetGenres AS (
+        SELECT GENRE_NAME AS GENRE_NAME, COUNT(*) as Count
+        FROM TargetLibraryBooks
+        WHERE GENRE_NAME IS NOT NULL
+        GROUP BY GENRE_NAME
+        UNION
+        SELECT SUB_GENRE_NAME AS GENRE_NAME, COUNT(*) as Count
+        FROM TargetLibraryBooks
+        WHERE SUB_GENRE_NAME IS NOT NULL
+        GROUP BY SUB_GENRE_NAME
+      ),
+      TopGenre AS (
+         SELECT GENRE_NAME
+         FROM TargetGenres
+         WHERE ROWNUM = 1
+       )
+       SELECT DISTINCT(GB2.TITLE), GB2.DESCRIPTION, GB2.AVERAGE_RATING, LIC2.GENRE_NAME, GB2.RATINGS_COUNT, TO_CHAR(GB2.PUBLICATION_YEAR, 9999) AS PUBLICATION_YEAR
+       FROM GOODREADSBOOK GB2,
+            GOODREADSISBN GI2,
+            LIBRARYISBN LI2,
+            LIBRARYBOOK LB2,
+            LIBRARYITEMCODE LIC2
+       WHERE GB2.GOODREADS_ID = GI2.GOODREADS_ID
+       AND (GI2.ISBN = LI2.ISBN OR GI2.ISBN13 = LI2.ISBN)
+       AND LI2.BIB_NUM = LB2.BIB_NUM
+       AND LB2.ITEM_COLLECTION = LIC2.CODE
+       AND LIC2.GENRE_NAME = (SELECT GENRE_NAME FROM TopGenre)
+       AND GB2.AVERAGE_RATING >= (SELECT MAX(AVERAGE_RATING) FROM TargetBook)
+       AND ROWNUM <= :numTitles
+       ORDER BY GB2.AVERAGE_RATING DESC
+       `;
+
+      const binds = [titleInput, numTitles];
+      const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+      const result = await conn.execute(query, binds, options);
+
+      console.log(result.rows);
+      return result.rows;
+
+    } catch (err) {
+      console.error('Ouch!', err)
+    } finally {
+      if (conn) { // conn assignment worked, need to close
+        try {
+          await conn.close();
+          console.log("Closing connection...");
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+  }
+
+  init(titleInput, numTitles).then(result => res.json(result));
+
+});
+
+
 module.exports = router;
