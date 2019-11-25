@@ -1,7 +1,4 @@
 import React, { Component } from "react";
-import Datetime from "react-datetime";
-
-import NumOfRowsDropdown from "components/NumOfRowsDropdown";
 // reactstrap components
 import {
     Button,
@@ -11,38 +8,36 @@ import {
 } from "reactstrap";
 import moment from "moment";
 
-class InventoryManager extends Component {
+class BorrowingTrends extends Component {
     constructor(props) {
         super(props);
         this.callAPI = this.callAPI.bind(this);
-        this.state = { inventory: [], startDate: moment(), endDate: new moment(), numOfResults: 25 };
+        this.state = { borrowingTrends: [], title: '', validTitle: false, error: '' };
     }
 
     callAPI() {
-        const startDate = this.state.startDate.format("YYYY-MM-DD");
-        const endDate = this.state.endDate.format("YYYY-MM-DD");
-        const numOfResults = this.state.numOfResults;
+        const title = this.state.title;
 
-        console.log(startDate);
-        console.log(endDate);
-        console.log(numOfResults);
-        const url = "/inventory/"+startDate+"/"+endDate+"/"+numOfResults;
+        console.log(title);
+        const url = "/borrowingtrends/" + title;
 
         fetch(url)
             .then(res => res.json())
-            .then(data => this.setState({ inventory: data }))
+            .then(data => this.setState({ borrowingTrends: data }))
             .catch(err => err);
     }
 
-    onChangeStartDate = date => this.setState({ startDate: date });
-    onChangeEndDate = date => this.setState({ endDate:date });
 
+    onChangeTitle(event) {
+        let title = event.target.value;
 
-    onChangeNumOfResults(event) {
-        this.setState({ numOfResults: event.target.value });
-    }
-
-    componentDidMount() {
+        // Validate title input
+        if(!title) {
+            this.setState({validTitle: false, title, error: 'Please enter book title'});
+        }
+        else {
+            this.setState({validTitle: true, title, error: ''});
+        }
     }
 
     render() {
@@ -171,4 +166,4 @@ class InventoryManager extends Component {
     }
 }
 
-export default InventoryManager;
+export default BorrowingTrends;
