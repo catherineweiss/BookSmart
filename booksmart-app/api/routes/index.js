@@ -850,4 +850,93 @@ router.get('/favorites', function(req, res, next) {
 });
 
 
+/**
+ * Librarian Dashboard - Book Background
+ * Parameters: Book Title
+ * Then graphs the data shown
+ *
+ */
+router.get('/borrowingtrends/:title', function(req, res, next) {
+    const title = req.params.title;
+
+    console.log("Borrowing Trends params: "+title);
+
+    async function init(title) {
+        try {
+            // Create a connection pool which will later be accessed via the
+            // pool cache as the 'default' pool.
+            await oracledb.createPool(config);
+            console.log('Connection pool started');
+
+            if(!title || title.trim() === '') {
+                return;
+            }
+
+            // Now the pool is running, it can be used
+            const titleInput = '%'+title.toLowerCase()+'%';
+            const rows = await getBorrowingTrends(titleInput);
+            // console.log(rows);
+            return rows;
+
+        } catch (err) {
+            console.error('init() error: ' + err.message);
+        } finally {
+            await closePool();
+        }
+    };
+
+    async function getBorrowingTrends (title) {
+        let conn;
+
+        try {
+            conn = await oracledb.getConnection();
+            const query =
+                `SELECT LB.TITLE, LI.ISBN, NBS.BESTSELLERS_DATE, NBS.RANK,
+                  NBS.RANK_LAST_WEEK, NBS.WEEKS_ON_LIST,
+                  NL.GENRE_1 as GENRE, NL.GENRE_2 as SUB_GENRE,
+                  LC.CHECKOUT_DATE_TIME, GRB.AVERAGE_RATING, GRB.RATINGS_COUNT
+                FROM
+                  LIBRARYBOOK LB JOIN LIBRARYCHECKOUT LC
+                    ON LB.BIB_NUM = LC.BIB_NUM
+                  AND lower(LB.TITLE) like :title
+                    JOIN LIBRARYISBN LI
+                      ON LB.BIB_NUM = LI.BIB_NUM
+                  AND LI.ISBN_TYPE = 'ISBN13'
+                    LEFT JOIN NYT_BOOK NB
+                      ON NB.ISBN13 = LI.ISBN
+                    LEFT JOIN NYT_BOOK_LIST NBL
+                      ON NB.ISBN13 = NBL.ISBN13
+                    LEFT JOIN NYT_BESTSELLER NBS
+                      ON NBS.ENTRY_ID = NBL.ENTRY_ID
+                    LEFT JOIN NYT_LIST NL
+                      ON NL.LIST_NAME = NBS.LIST_NAME
+                    LEFT JOIN GOODREADSISBN GRI
+                      ON LI.ISBN = NBL.ISBN13
+                    LEFT JOIN GOODREADSBOOK GRB
+                      ON GRB.GOODREADS_ID = GRI.GOODREADS_ID;`;
+            const binds = [title];
+            const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+            const result = await conn.execute(query, binds, options);
+
+            console.log(result.rows);
+            return result.rows;
+
+        } catch (err) {
+            console.error('Ouch!', err)
+        } finally {
+            if (conn) { // conn assignment worked, need to close
+                try {
+                    await conn.close();
+                    console.log("Closing connection...");
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    init(title).then(result => res.json(result));
+});
+
+
 module.exports = router;
