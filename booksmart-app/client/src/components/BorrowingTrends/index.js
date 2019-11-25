@@ -7,6 +7,7 @@ import {
     Col
 } from "reactstrap";
 import moment from "moment";
+import BorrowingTrendsGraph from 'components/BorrowingTrendsGraph';
 
 class BorrowingTrends extends Component {
     constructor(props) {
@@ -43,7 +44,7 @@ class BorrowingTrends extends Component {
     render() {
         let results;
 
-        const inventory = this.state.inventory.map( (inventory, index) => {
+        const trends = this.state.trends.map( (trends, index) => {
             return <Row key={index}>
                 <Col md="8">
                     <p>{inventory.TITLE}</p>
@@ -63,7 +64,7 @@ class BorrowingTrends extends Component {
             </Row>
         });
 
-        if(this.state.inventory.length !== 0) {
+        if(this.state.borrowingTrends.length !== 0) {
             results =
              <Row id="results">
                 <Col md="12">
@@ -95,48 +96,24 @@ class BorrowingTrends extends Component {
         return (
             <div>
                 <Container>
-                    <h3 className="title">Inventory Manager</h3>
-                    <Row id="inventory">
+                    <h3 className="title">Borrowing Trends</h3>
+                    <Row id="borrowing-trend">
                         <Col md="12">
-                            <Row id="inventory-date">
+                            <Row id="input-group">
                                 <Col md="6">
-                                    <h4>Start Date</h4>
+                                    <h4>Title</h4>
                                     <Row>
                                         <Col md="6">
-                                            <div className="datepicker-container">
-                                                    <Datetime
-                                                        timeFormat={false}
-                                                        inputProps={{ placeholder: "Start Date" }}
-                                                        onChange={this.onChangeStartDate}
-                                                        value={this.state.startDate}
-                                                    />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                                <Col md="6">
-                                    <h4>End Date</h4>
-                                    <Row>
-                                        <Col md="6">
-                                            <div className="datepicker-container">
-                                                    <Datetime
-                                                        timeFormat={false}
-                                                        inputProps={{ placeholder: "End Date" }}
-                                                        onChange={this.onChangeEndDate}
-                                                        value={this.state.endDate}
-                                                    />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            </Row>
-                            <Row id="num-of-rows">
-                                <Col md="6">
-                                    <h4>Num of results</h4>
-                                    <Row>
-                                        <Col md="6">
-                                            <div className="num-of-rows-dropdown">
-                                                    <NumOfRowsDropdown handleClick={this.onChangeNumOfResults.bind(this)} numOfResults={this.state.numOfResults}/>
+                                            <div className="input-title">
+                                                <FormGroup>
+                                                    <Input
+                                                        placeholder="Book Title"
+                                                        type="text"
+                                                        value={this.state.title}
+                                                        onChange={this.onChangeTitle}
+                                                    ></Input>
+                                                    <span style={{color: "red"}}>{this.state.error}</span>
+                                                </FormGroup>
                                             </div>
                                         </Col>
                                     </Row>
@@ -145,11 +122,12 @@ class BorrowingTrends extends Component {
                                     <Row>
                                         <Col md="6">
                                             <div className="submit">
-                                                <Button
-                                                    className="btn-round"
-                                                    color="primary"
-                                                    href="#"
-                                                    onClick={this.callAPI}
+                                                    <Button
+                                                        disabled={!this.state.validTitle}
+                                                        className="btn-round"
+                                                        color="primary"
+                                                        href="#"
+                                                        onClick={this.callAPI}
                                                     >Search</Button>
                                             </div>
                                         </Col>
