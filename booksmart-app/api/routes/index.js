@@ -526,6 +526,83 @@ router.get('/notreadbooks/:year', function(req, res, next) {
     }
 
     init(year).then(result => res.json(result));
+  });
+ 
+ /*
+  * Reader Tool: Great Books You've Never Heard Of
+ */
+router.get('/greatbooks/:genre/:num', function(req, res, next) {
+  const genre = req.params.genre;
+  const num = req.params.num;
+
+  console.log("Great Books params: "+genre+", "+num);
+
+  async function init(genre, num) {
+      try {
+          // Create a connection pool which will later be accessed via the
+          // pool cache as the 'default' pool.
+          await oracledb.createPool(config);
+          console.log('Connection pool started');
+
+          // Now the pool is running, it can be used
+          const rows = await getGreatBooks(genre, num);
+          // console.log(rows);
+          return rows;
+
+      } catch (err) {
+          console.error('init() error: ' + err.message);
+      } finally {
+          await closePool();
+      }
+  };
+
+  async function getGreatBooks (genre, num) {
+      let conn;
+
+      try {
+          conn = await oracledb.getConnection();
+          const query =
+              `WITH GENRE_SELECTION AS (
+                SELECT LC2.BIB_NUM, LB2.TITLE, LI2.ISBN, LC2.ID AS CHECKOUT_ID
+                FROM LIBRARYCHECKOUT_2 LC2
+                    JOIN LIBRARYBOOK LB2 ON LC2.BIB_NUM = LB2.BIB_NUM
+                    JOIN LIBRARYISBN LI2 ON LC2.BIB_NUM = LI2.BIB_NUM
+                    JOIN LIBRARYITEMCODE LIC2 ON LB2.ITEM_COLLECTION = LIC2.CODE
+                WHERE LIC2.GENRE_NAME = :genre
+            ), LIB_BOOKS_ON_NYT_LISTS AS (
+                SELECT LI3.BIB_NUM
+                FROM NYT_BOOK NB JOIN LIBRARYISBN LI3 ON NB.ISBN13 = LI3.ISBN
+            )
+            SELECT TITLE, NUM_CHECKOUTS
+            FROM (SELECT GS.TITLE, COUNT(GS.CHECKOUT_ID) AS NUM_CHECKOUTS, GS.BIB_NUM
+                  FROM GENRE_SELECTION GS
+                  WHERE GS.BIB_NUM NOT IN (SELECT BIB_NUM FROM LIB_BOOKS_ON_NYT_LISTS)
+                  GROUP BY GS.BIB_NUM, GS.TITLE
+                  ORDER BY NUM_CHECKOUTS DESC)
+            WHERE ROWNUM <= :num `;
+
+          const binds = [genre, num];
+          const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+          const result = await conn.execute(query, binds, options);
+
+          console.log(result.rows);
+          return result.rows;
+
+      } catch (err) {
+          console.error('Ouch!', err)
+      } finally {
+          if (conn) { // conn assignment worked, need to close
+              try {
+                  await conn.close();
+                  console.log("Closing connection...");
+              } catch (err) {
+                  console.error(err);
+              }
+          }
+      }
+  }
+
+  init(genre, num).then(result => res.json(result));
 });
 
 /**
