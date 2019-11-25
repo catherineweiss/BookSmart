@@ -21,7 +21,7 @@ import BookBackgroundPage from "views/booksmart/reader/BookBackground";
 import GreatBooksPage from "views/booksmart/reader/GreatBooks";
 import RecommendationsPage from "views/booksmart/reader/Recommendations";
 import FavoritesPage from "views/booksmart/reader/Favorites";
-import BookBackgroundPage from "views/booksmart/librarian/BorrowingTrends";
+import BorrowingTrendsPage from "views/booksmart/librarian/BorrowingTrends";
 
 import * as serviceWorker from './serviceWorker';
 
