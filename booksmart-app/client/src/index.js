@@ -19,6 +19,7 @@ import DisplayPlannerPage from "views/booksmart/librarian/DisplayPlanner";
 import NotReadBooksPage from "views/booksmart/librarian/NotReadBooks";
 import BookBackgroundPage from "views/booksmart/reader/BookBackground";
 import GreatBooksPage from "views/booksmart/reader/GreatBooks";
+import RecommendationsPage from "views/booksmart/reader/Recommendations"
 
 import * as serviceWorker from './serviceWorker';
 
@@ -34,6 +35,7 @@ ReactDOM.render(
                 <Route path="/not-read-books" render={props => <NotReadBooksPage/>} />
                 <Route path="/book-background" render={props => <BookBackgroundPage/>} />
                 <Route path="/bestsellers" render={props => <BestsellersPage/>} />
+                <Route path="/recommendations" render={props => <RecommendationsPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />
                 <Route path="/great-books" render={props => <GreatBooksPage/>} />
                 <Redirect to="/index" />
