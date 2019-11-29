@@ -851,7 +851,7 @@ router.get('/favorites', function(req, res, next) {
 
 
 /**
- * Librarian Dashboard - Book Background
+ * Librarian Dashboard - Borrowing Trends
  * Parameters: Book Title
  * Then graphs the data shown
  *
