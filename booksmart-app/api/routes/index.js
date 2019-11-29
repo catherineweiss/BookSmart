@@ -891,29 +891,99 @@ router.get('/borrowingtrends/:title', function(req, res, next) {
         try {
             conn = await oracledb.getConnection();
             const query =
-                `SELECT LB.TITLE, LI.ISBN, NBS.BESTSELLERS_DATE, NBS.RANK,
-                  NBS.RANK_LAST_WEEK, NBS.WEEKS_ON_LIST,
-                  NL.GENRE_1 as GENRE, NL.GENRE_2 as SUB_GENRE,
-                  LC.CHECKOUT_DATE_TIME, GRB.AVERAGE_RATING, GRB.RATINGS_COUNT
+                `SELECT LB.TITLE, LI.ISBN, COUNT(LC.CHECKOUT_DATE) AS CHECKOUTS_PER_MONTH,
+                  EXTRACT(MONTH FROM LC.CHECKOUT_DATE) AS MONTH,
+                  EXTRACT(YEAR FROM LC.CHECKOUT_DATE) AS YEAR,
+                  GRB.AVERAGE_RATING, GRB.RATINGS_COUNT
                 FROM
-                  LIBRARYBOOK LB JOIN LIBRARYCHECKOUT LC
-                    ON LB.BIB_NUM = LC.BIB_NUM
+                LIBRARYBOOK LB JOIN LIBRARYCHECKOUT_2 LC
+                  ON LB.BIB_NUM = LC.BIB_NUM
                   AND lower(LB.TITLE) like :title
-                    JOIN LIBRARYISBN LI
-                      ON LB.BIB_NUM = LI.BIB_NUM
+                JOIN LIBRARYISBN LI
+                  ON LB.BIB_NUM = LI.BIB_NUM
                   AND LI.ISBN_TYPE = 'ISBN13'
-                    LEFT JOIN NYT_BOOK NB
-                      ON NB.ISBN13 = LI.ISBN
-                    LEFT JOIN NYT_BOOK_LIST NBL
-                      ON NB.ISBN13 = NBL.ISBN13
-                    LEFT JOIN NYT_BESTSELLER NBS
-                      ON NBS.ENTRY_ID = NBL.ENTRY_ID
-                    LEFT JOIN NYT_LIST NL
-                      ON NL.LIST_NAME = NBS.LIST_NAME
-                    LEFT JOIN GOODREADSISBN GRI
-                      ON LI.ISBN = NBL.ISBN13
-                    LEFT JOIN GOODREADSBOOK GRB
-                      ON GRB.GOODREADS_ID = GRI.GOODREADS_ID;`;
+                JOIN LibraryItemCode LC1 on LB.ITEM_COLLECTION = LC1.CODE AND LC1.GENRE_NAME != 'NA'
+                JOIN LibraryItemCode LC2 on LB.ITEM_TYPE = LC2.CODE AND LC2.GENRE_NAME != 'NA'
+                LEFT JOIN GOODREADSISBN GRI
+                  ON LI.ISBN = GRI.ISBN13
+                LEFT JOIN GOODREADSBOOK GRB
+                  ON GRB.GOODREADS_ID = GRI.GOODREADS_ID
+                GROUP BY LB.TITLE, LI.ISBN, EXTRACT(MONTH FROM LC.CHECKOUT_DATE), EXTRACT(YEAR FROM LC.CHECKOUT_DATE), GRB.AVERAGE_RATING, GRB.RATINGS_COUNT
+                ORDER BY TITLE, YEAR, MONTH, AVERAGE_RATING DESC;`;
+            const binds = [title];
+            const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
+            const result = await conn.execute(query, binds, options);
+
+            console.log(result.rows);
+            return result.rows;
+
+        } catch (err) {
+            console.error('Ouch!', err)
+        } finally {
+            if (conn) { // conn assignment worked, need to close
+                try {
+                    await conn.close();
+                    console.log("Closing connection...");
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    init(title).then(result => res.json(result));
+});
+
+
+router.get('/nytrank/:title', function(req, res, next) {
+    const title = req.params.title;
+
+    console.log("NYT Rank params: "+title);
+
+    async function init(title) {
+        try {
+            // Create a connection pool which will later be accessed via the
+            // pool cache as the 'default' pool.
+            await oracledb.createPool(config);
+            console.log('Connection pool started');
+
+            if(!title || title.trim() === '') {
+                return;
+            }
+
+            // Now the pool is running, it can be used
+            const titleInput = '%'+title.toLowerCase()+'%';
+            const rows = await getNYTRank (titleInput);
+            // console.log(rows);
+            return rows;
+
+        } catch (err) {
+            console.error('init() error: ' + err.message);
+        } finally {
+            await closePool();
+        }
+    };
+
+    async function getNYTRank (title) {
+        let conn;
+
+        try {
+            conn = await oracledb.getConnection();
+            const query =
+                `SELECT LB.TITLE, LI.ISBN, NBS.BESTSELLERS_DATE, NBS.RANK
+                FROM LIBRARYBOOK LB JOIN LIBRARYISBN LI
+                  ON LB.BIB_NUM = LI.BIB_NUM
+                  AND LI.ISBN_TYPE = 'ISBN13'
+                  AND lower(LB.TITLE) like 'harry potter and the sorcerer%'
+                JOIN NYT_BOOK NB
+                  ON NB.ISBN13 = LI.ISBN
+                LEFT JOIN NYT_BOOK_LIST NBL
+                  ON NB.ISBN13 = NBL.ISBN13
+                LEFT JOIN NYT_BESTSELLER NBS
+                  ON NBS.ENTRY_ID = NBL.ENTRY_ID
+                LEFT JOIN NYT_LIST NL
+                  ON NL.LIST_NAME = NBS.LIST_NAME
+                ORDER BY LI.ISBN, BESTSELLERS_DATE ASC;`;
             const binds = [title];
             const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
             const result = await conn.execute(query, binds, options);
