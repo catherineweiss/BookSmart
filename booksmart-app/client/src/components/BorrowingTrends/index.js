@@ -18,7 +18,6 @@ class BorrowingTrends extends Component {
 
     callAPI() {
         const title = this.state.title;
-
         console.log(title);
         const url = "/borrowingtrends/" + title;
 
