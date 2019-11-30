@@ -14,7 +14,10 @@ import BorrowingTrendsGraph from 'components/BorrowingTrendsGraph';
 class BorrowingTrends extends Component {
     constructor(props) {
         super(props);
-        this.callAPI = this.callAPI.bind(this);
+        this.callCheckoutsAPI = this.callCheckoutsAPI.bind(this);
+        this.callRankingsAPI = this.callRankingsAPI.bind(this);
+        this.callAPIs = this.callAPIs.bind(this);
+        this.onChangeTitle = this.onChangeTitle.bind(this);
         this.state = { borrowingTrends: [], rankingTrends: [], title: '', validTitle: false, error: '' };
     }
 
@@ -32,12 +35,17 @@ class BorrowingTrends extends Component {
     callRankingsAPI() {
         const title = this.state.title;
         console.log(title);
-        const url = "/borrowingtrends/" + title;
+        const url = "/nytrank/" + title;
 
         fetch(url)
             .then(res => res.json())
             .then(data => this.setState({ borrowingTrends: data }))
             .catch(err => err);
+    }
+
+    callAPIs() {
+        callCheckoutsAPI();
+
     }
 
 
