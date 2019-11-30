@@ -9,7 +9,7 @@ import {
     Col
 } from "reactstrap";
 import moment from "moment";
-import BorrowingTrendsGraph from 'components/BorrowingTrendsGraph';
+//import BorrowingTrendsGraph from 'components/BorrowingTrendsGraph';
 import REACTDOM from 'react-dom';
 import C3Chart from 'react-c3js';
 import 'c3/c3.css';
@@ -65,62 +65,100 @@ class BorrowingTrends extends Component {
     }
 
     render() {
-        let results;
+        let borrowingTrendsResults;
+        let nytRankingResults;
 
+        //creates the borrowingtrends graph
         const borrowingTrends = this.state.borrowingTrends.map( (borrowingTrends, index) => {
             return <Row key={index}>
-                <Col md="8">
+                <Col md="3">
                     <p>{borrowingTrends.TITLE}</p>
                 </Col>
 
-                <Col md="2">
-                    <p>{borrowingTrends.GENRE}</p>
+                <Col md="9">
+                    {const LineChart = ({data}) =>
+                        <C3Chart data = {{json: data}} />;
+                    const chartData = {
+                        line: {
+                            data1: borrowingTrends.CHECKOUTS_PER_MONTH;
+                        }
+                    }
+                    ReactDom.render(
+                        <div>
+                            <LineChart data = {chartData.line} />
+                        </div>, document.getElementbyId('react-c3js')
+                    )}
+                </Col>
+            </Row>
+        });
+
+        const rankingTrends = this.state.rankingTrends.map( (rankingTrends, index) => {
+            return <Row key={index}>
+                <Col md="3">
+                    <p>{borrowingTrends.TITLE}</p>
                 </Col>
 
-                <Col md="1">
-                    <p>{borrowingTrends.ITEM_COUNT}</p>
-                </Col>
-
-                <Col md="1">
-                    <p>{borrowingTrends.CHECKOUT_COUNT}</p>
+                <Col md="9">
+                    {const LineChart = ({data}) =>
+                        <C3Chart data = {{json: data}} />;
+                    const chartData = {
+                        line: {
+                            data1: rankingTrends.RANK;
+                        }
+                    }
+                    ReactDom.render(
+                        <div>
+                            <LineChart data = {chartData.line} />
+                        </div>, document.getElementbyId('react-c3js')
+                    )}
                 </Col>
             </Row>
         });
 
         if(this.state.borrowingTrends.length !== 0) {
-            results =
+            borrowingTrendsResults =
              <Row id="results">
-                <Col md="12">
+                <Col md="8">
                     <Row id="result-header">
-                        <Col md="8">
+                        <Col md="12">
                             <h5>Title</h5>
                         </Col>
-
-                        <Col md="2">
-                            <h5>Genre</h5>
-                        </Col>
-
-                        <Col md="1">
-                            <h5>Item Count</h5>
-                        </Col>
-
-                        <Col md="1">
-                            <h5>Checkout Count</h5>
-                        </Col>
                     </Row>
-                    {trends}
+                    {borrowingTrends}
                 </Col>
             </Row>;
         }
         else {
-            results = '';
+            borrowingTrendsResults = '';
+        }
+
+        if(this.state.rankingTrends.length !== 0) {
+            nytRankingResults =
+             <Row id="results">
+                <Col md="8">
+                    {rankingTrends}
+                </Col>
+            </Row>;
+        }
+        else {
+            nytRankingResults = '';
         }
 
         return (
             <div>
                 <Container>
                     <h3 className="title">Borrowing Trends</h3>
-                    <Row id="borrowing-trend">
+                    <Row id="page-info">
+                        <Col md="8">
+                            <Row>
+                                <Col md="12">
+                                    <div>Funding for public libraries can only cover a finite amount of books. So, how should libraries determine how to stock up on any given title?</div>
+                                    <div>With the Borrowing Trends Feature, Librarians can input a user-defined book title and get a graphical display of checkouts over time.</div>
+                                    <div>This feature will also display the book’s rank on a NYT bestseller list over time and information from Goodreads regarding its rating if available.</div>
+                                    <div>This way, librarians can visualize the checkouts and the influence being a bestseller can have so they can properly stock up on books that are in high demand.</div>
+                                </Col>
+                            </Row>
+                    <Row id="title-input">
                         <Col md="12">
                             <Row id="input-group">
                                 <Col md="6">
@@ -160,19 +198,9 @@ class BorrowingTrends extends Component {
                         </Col>
                     </Row>
                     <div className="space-50"></div>
-                    {const LineChart = ({data}) =>
-                        <C3Chart data = {{json: data}} />;
-                    const chartData = {
-                        line: {
-                            data1: borrowingTrends.CHECKOUTS_PER_MONTH;
-                        }
-                    }
-                    ReactDom.render(
-                        <div>
-                            <LineChart data = {chartData.line} />
-                        </div>, document.getElementbyId('react-c3js')
-                    )
-                    }
+                    {borrowingTrendsResults}
+                    <div className="space-50"></div>
+                    {nytRankingResults}
                 </Container>
             </div>
         );
