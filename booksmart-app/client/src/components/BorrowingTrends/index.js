@@ -10,6 +10,9 @@ import {
 } from "reactstrap";
 import moment from "moment";
 import BorrowingTrendsGraph from 'components/BorrowingTrendsGraph';
+import REACTDOM from 'react-dom';
+import C3Chart from 'react-c3js';
+import 'c3/c3.css';
 
 class BorrowingTrends extends Component {
     constructor(props) {
@@ -64,22 +67,22 @@ class BorrowingTrends extends Component {
     render() {
         let results;
 
-        const trends = this.state.trends.map( (trends, index) => {
+        const borrowingTrends = this.state.borrowingTrends.map( (borrowingTrends, index) => {
             return <Row key={index}>
                 <Col md="8">
-                    <p>{trends.TITLE}</p>
+                    <p>{borrowingTrends.TITLE}</p>
                 </Col>
 
                 <Col md="2">
-                    <p>{trends.GENRE}</p>
+                    <p>{borrowingTrends.GENRE}</p>
                 </Col>
 
                 <Col md="1">
-                    <p>{trends.ITEM_COUNT}</p>
+                    <p>{borrowingTrends.ITEM_COUNT}</p>
                 </Col>
 
                 <Col md="1">
-                    <p>{trends.CHECKOUT_COUNT}</p>
+                    <p>{borrowingTrends.CHECKOUT_COUNT}</p>
                 </Col>
             </Row>
         });
@@ -157,7 +160,19 @@ class BorrowingTrends extends Component {
                         </Col>
                     </Row>
                     <div className="space-50"></div>
-                    {results}
+                    {const LineChart = ({data}) =>
+                        <C3Chart data = {{json: data}} />;
+                    const chartData = {
+                        line: {
+                            data1: borrowingTrends.CHECKOUTS_PER_MONTH;
+                        }
+                    }
+                    ReactDom.render(
+                        <div>
+                            <LineChart data = {chartData.line} />
+                        </div>, document.getElementbyId('react-c3js')
+                    )
+                    }
                 </Container>
             </div>
         );
