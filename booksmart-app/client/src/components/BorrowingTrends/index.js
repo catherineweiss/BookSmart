@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 // reactstrap components
 import {
+    FormGroup,
+    Input,
     Button,
     Container,
     Row,
@@ -13,10 +15,21 @@ class BorrowingTrends extends Component {
     constructor(props) {
         super(props);
         this.callAPI = this.callAPI.bind(this);
-        this.state = { borrowingTrends: [], title: '', validTitle: false, error: '' };
+        this.state = { borrowingTrends: [], rankingTrends: [], title: '', validTitle: false, error: '' };
     }
 
-    callAPI() {
+    callCheckoutsAPI() {
+        const title = this.state.title;
+        console.log(title);
+        const url = "/borrowingtrends/" + title;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => this.setState({ borrowingTrends: data }))
+            .catch(err => err);
+    }
+
+    callRankingsAPI() {
         const title = this.state.title;
         console.log(title);
         const url = "/borrowingtrends/" + title;
@@ -46,19 +59,19 @@ class BorrowingTrends extends Component {
         const trends = this.state.trends.map( (trends, index) => {
             return <Row key={index}>
                 <Col md="8">
-                    <p>{inventory.TITLE}</p>
+                    <p>{trends.TITLE}</p>
                 </Col>
 
                 <Col md="2">
-                    <p>{inventory.GENRE}</p>
+                    <p>{trends.GENRE}</p>
                 </Col>
 
                 <Col md="1">
-                    <p>{inventory.ITEM_COUNT}</p>
+                    <p>{trends.ITEM_COUNT}</p>
                 </Col>
 
                 <Col md="1">
-                    <p>{inventory.CHECKOUT_COUNT}</p>
+                    <p>{trends.CHECKOUT_COUNT}</p>
                 </Col>
             </Row>
         });
@@ -84,7 +97,7 @@ class BorrowingTrends extends Component {
                             <h5>Checkout Count</h5>
                         </Col>
                     </Row>
-                    {inventory}
+                    {trends}
                 </Col>
             </Row>;
         }
