@@ -45,7 +45,7 @@ class BorrowingTrends extends Component {
 
     callAPIs() {
         callCheckoutsAPI();
-
+        callRankingsAPI();
     }
 
 
@@ -147,7 +147,7 @@ class BorrowingTrends extends Component {
                                                         className="btn-round"
                                                         color="primary"
                                                         href="#"
-                                                        onClick={this.callAPI}
+                                                        onClick={this.callAPIs}
                                                     >Search</Button>
                                             </div>
                                         </Col>
