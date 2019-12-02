@@ -7,6 +7,7 @@ import {
     Row,
     Col
 } from "reactstrap";
+import HeaderSub from "components/HeaderSub";
 import YearDropdown from "components/YearDropdown";
 
 class NotReadBooks extends Component {
@@ -88,6 +89,7 @@ class NotReadBooks extends Component {
         return (
             <div>
                 <Container>
+                    <HeaderSub />
                     <h3 className="title">What People Are Not Reading</h3>
                     <Row id="notReadBooks">
                         <Col md="12">

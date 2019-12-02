@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Datetime from "react-datetime";
-
+import HeaderSub from "components/HeaderSub";
 import NumOfRowsDropdown from "components/NumOfRowsDropdown";
 // reactstrap components
 import {
@@ -100,6 +100,7 @@ class InventoryManager extends Component {
         return (
             <div>
                 <Container>
+                <HeaderSub />
                     <h3 className="title">Inventory Manager</h3>
                     <Row id="inventory">
                         <Col md="12">

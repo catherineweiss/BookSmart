@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import BestsellerListsDropdown from "components/BestsellerListsDropdown";
+import HeaderSub from "components/HeaderSub";
 import YearDropdown from "components/YearDropdown";
 import NumOfTimesDropdown from "components/NumOfTimesDropdown"
 import NumOfRowsDropdown from "components/NumOfRowsDropdown";
@@ -71,6 +72,7 @@ class DisplayPlanner extends Component {
         return (
             <div>
                 <Container>
+                <HeaderSub />
                     <h3 className="title">Book Display Planner: Find bestselling authors for your next display</h3> 
                     <div className="space-50"></div>
                     <Row id="inputs-to-display">

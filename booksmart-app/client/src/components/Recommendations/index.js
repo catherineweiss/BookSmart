@@ -9,6 +9,7 @@ import {
   Row
 } from "reactstrap";
 import CustomNumOfRowsDropdown from "components/CustomNumOfRowsDropdown";
+import HeaderSub from "components/HeaderSub";
 
 
 class Recommendations extends Component {
@@ -71,6 +72,7 @@ class Recommendations extends Component {
         return (
           <div>
               <Container>
+                <HeaderSub />
                 <h3 className="title">Recommendations</h3>
                 <Row id="recommendations">
                   <Col md={leftWidth}>

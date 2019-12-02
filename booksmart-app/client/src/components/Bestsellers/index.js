@@ -6,6 +6,7 @@ import {
     Col
 } from "reactstrap";
 import CustomNumOfRowsDropdown from "components/CustomNumOfRowsDropdown";
+import HeaderSub from "components/HeaderSub";
 import ListDropdown from "components/ListDropdown";
 
 
@@ -54,6 +55,7 @@ class Bestsellers extends Component {
         return (
           <div>
               <Container>
+                <HeaderSub />
                 <h3 className="title">Bestsellers</h3>
                 <Row id="bestsellers">
                   <Col md={leftWidth}>

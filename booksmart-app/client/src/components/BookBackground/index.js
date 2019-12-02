@@ -14,6 +14,7 @@ import {
     CardText,
     CardImg
 } from "reactstrap";
+import HeaderSub from "components/HeaderSub";
 
 class BookBackground extends Component {
     constructor(props) {
@@ -85,6 +86,7 @@ class BookBackground extends Component {
         return (
             <div>
                 <Container>
+                    <HeaderSub />
                     <h3 className="title">Book Background</h3>
                     <Row id="book-background">
                         <Col md="12">

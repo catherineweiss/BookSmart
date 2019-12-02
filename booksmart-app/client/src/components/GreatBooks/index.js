@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import GenreDropdown from "components/GenreDropdown";
+import HeaderSub from "components/HeaderSub";
 import NumOfRowsDropdown from "components/NumOfRowsDropdown";
 
 // reactstrap components
@@ -56,6 +57,7 @@ class GreatBooks extends Component {
         return (
             <div>
                 <Container>
+                    <HeaderSub />
                     <h3 className="title">Great Books You've Never Heard Of</h3> 
                     <Row id="inputs-to-display">
                         <Col md="8">
