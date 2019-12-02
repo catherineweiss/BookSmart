@@ -18,20 +18,35 @@ function LandingPage() {
                 <div className="section section-about-us">
                     <Container>
                         <Row>
-                            <Col className="ml-auto mr-auto text-center" md="8">
+                            <Col className="ml-auto mr-auto text-center" md="5">
                                 <h2 className="title">What is BookSmart?</h2>
                                 <h5 className="description">
-                                    BookSmart aggregates data on book sales, library checkouts and reader
-                                    reviews/ratings to provide information and insights to two user groups: librarians
-                                    and readers. Librarians will use the app to gauge the popularity of new releases and
-                                    books already on their shelves, in order to determine how many copies of those books
-                                    to purchase for the stacks. Readers will gain deeper insight into what other people
-                                    are reading so they can add titles to their reading list. BookSmart’s data tracks
-                                    reading habits reflected in a variety of sources, not just recent bestseller lists,
-                                    so it can provide a more detailed view into what is being read and talked about.
+                                Helping readers and librarians understand patterns and trends 
+                                in book borrowing, buying, and popularity. 
                                 </h5>
                             </Col>
                         </Row>
+
+                        <Row>
+                            <Col className="ml-auto mr-auto text-center" md="6">
+                                <h2 className="title">BookSmart Features</h2>
+                                <h5 className="description">
+                                Are you a librarian? BookSmart provides access to tools designed 
+                                to assist with inventory management and book display presentation.  
+                                BookSmart gauges the popularity of new releases and books already on 
+                                library shelves and identifies books rarely borrowed, as well as providing 
+                                a visualization of borrowing trends.</h5> 
+
+                                <h5 className="description">
+                                Looking for your next great read? BookSmart aggregates information on book 
+                                titles from multiple sources, provide deeper insight into what other people 
+                                are reading, and offer book recommendations based on personal preference. 
+                                Check it out! 
+                                </h5>
+                            </Col>
+                        </Row>
+
+
                         <div className="separator separator-primary"></div>
                         <div className="section-story-overview">
                             <Row>
@@ -96,6 +111,18 @@ function LandingPage() {
                         </div>
                     </Container>
                 </div>
+                <Row>
+                            <Col className="ml-auto mr-auto text-center" md="6">
+                                <h2 className="title">About Our Dataset</h2>
+                                <h5 className="description">
+                                Booksmart relies on three datasets for information: The New York Times Books API 
+                                for information about book sales, the Goodreads API for information about ratings 
+                                and reviews, and Seattle Public Library Checkout Records for information about 
+                                checkouts from a major public library system. In BookSmart v1.0, data is limited to 
+                                bestseller and library checkout information from 2013 to 2017.  
+                                </h5>
+                            </Col>
+                        </Row>
             </div>
         </>
     );
