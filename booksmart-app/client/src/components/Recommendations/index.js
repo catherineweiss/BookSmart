@@ -74,6 +74,11 @@ class Recommendations extends Component {
               <Container>
                 <HeaderSub />
                 <h3 className="title">Recommendations</h3>
+                <div>A great book recommendation can be hard to come by. Avid readers in search of something new will </div>
+                <div>love this BookSmart feature. Simply enter a title for a book you enjoyed and BookSmart will recommend</div>
+                <div>books of a similar genre that earned at least as good a rating by fellow readers. BookSmart will </div>
+                <div>also help by sorting the recommendations by rating and publication date. Enjoy your new finds!</div>
+                <div className="space-50"></div>
                 <Row id="recommendations">
                   <Col md={leftWidth}>
                     <Row>

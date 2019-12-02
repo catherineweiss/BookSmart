@@ -88,6 +88,12 @@ class BookBackground extends Component {
                 <Container>
                     <HeaderSub />
                     <h3 className="title">Book Background</h3>
+                    <div>A one-stop resource for getting a multi-faceted view of books. Enter a title of interest </div>
+                    <div>and easily search our database to access library checkout statistics, learn how long the </div>
+                    <div>title sat on a New York Times bestseller list (if at all), and get actual reader ratings. </div>
+                    <div>If available, you’ll even see book cover art and a description. We’ve aggregated the data </div>
+                    <div>to give you the full picture.</div>
+                    <div className="space-50"></div>
                     <Row id="book-background">
                         <Col md="12">
                             <Row id="input-group">
