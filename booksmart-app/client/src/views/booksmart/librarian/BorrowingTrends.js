@@ -1,5 +1,5 @@
 import React from 'react';
-import Bestsellers from "components/BorrowingTrends";
+import BorrowingTrends from "components/BorrowingTrends";
 
 function BorrowingTrendsPage() {
     return (
