@@ -247,7 +247,7 @@ router.get('/inventory/:start/:end/:num', cacheMiddleware(3000), function(req, r
                             AND LC2.checkout_date <= TO_DATE(:endDate, 'YYYY-MM-DD')
                             AND LIC1.genre_name != 'NA'
                             AND LIC2.genre_name != 'NA'
-                        GROUP BY LC2.bib_num                            
+                        GROUP BY LC2.bib_num
                         ORDER BY checkout_count DESC
                     )
                WHERE ROWNUM < :num
@@ -909,7 +909,7 @@ router.get('/borrowingtrends/:title', function(req, res, next) {
                 LEFT JOIN GOODREADSBOOK GRB
                   ON GRB.GOODREADS_ID = GRI.GOODREADS_ID
                 GROUP BY LB.TITLE, LI.ISBN, EXTRACT(MONTH FROM LC.CHECKOUT_DATE), EXTRACT(YEAR FROM LC.CHECKOUT_DATE), GRB.AVERAGE_RATING, GRB.RATINGS_COUNT
-                ORDER BY TITLE, YEAR, MONTH, AVERAGE_RATING DESC;`;
+                ORDER BY TITLE, YEAR, MONTH, AVERAGE_RATING DESC`;
             const binds = [title];
             const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
             const result = await conn.execute(query, binds, options);
@@ -983,7 +983,7 @@ router.get('/nytrank/:title', function(req, res, next) {
                   ON NBS.ENTRY_ID = NBL.ENTRY_ID
                 LEFT JOIN NYT_LIST NL
                   ON NL.LIST_NAME = NBS.LIST_NAME
-                ORDER BY LI.ISBN, BESTSELLERS_DATE ASC;`;
+                ORDER BY LI.ISBN, BESTSELLERS_DATE ASC`;
             const binds = [title];
             const options = { outFormat: oracledb.OUT_FORMAT_OBJECT };
             const result = await conn.execute(query, binds, options);
