@@ -2,6 +2,28 @@ var express = require('express');
 var router = express.Router();
 var config = require('../db-config.js');
 
+// Caching
+var cache = require('memory-cache');
+
+// configure cache middleware
+let memCache = new cache.Cache();
+let cacheMiddleware = (duration) => {
+    return (req, res, next) => {
+        let key =  '__express__' + req.originalUrl || req.url;
+        let cacheContent = memCache.get(key);
+        if(cacheContent){
+            res.send( cacheContent );
+        }else{
+            res.sendResponse = res.send;
+            res.send = (body) => {
+                memCache.put(key,body,duration*1000);
+                res.sendResponse(body);
+            };
+            next()
+        }
+    }
+};
+
 /* ----- Connects to Booksmart Oracle database ----- */
 
 const oracledb = require('oracledb');
@@ -47,7 +69,7 @@ router.get('/', function(req, res, next) {
 /**
  * Bestsellers
  */
-router.get('/bestsellers/:list/:num', function(req, res, next) {
+router.get('/bestsellers/:list/:num', cacheMiddleware(3000), function(req, res, next) {
   const list = req.params.list;
   const num = req.params.num;
 
@@ -117,7 +139,7 @@ router.get('/bestsellers/:list/:num', function(req, res, next) {
 
 });
 
-router.get('/bestsellers/getlists', function(req, res, next) {
+router.get('/bestsellers/getlists', cacheMiddleware(3000), function(req, res, next) {
 
   async function init() {
     try {
@@ -172,7 +194,7 @@ router.get('/bestsellers/getlists', function(req, res, next) {
 /**
  * Inventory Manager
  */
-router.get('/inventory/:start/:end/:num', function(req, res, next) {
+router.get('/inventory/:start/:end/:num', cacheMiddleware(3000), function(req, res, next) {
     const start = req.params.start;
     const end = req.params.end;
     const num = req.params.num;
@@ -253,7 +275,7 @@ router.get('/inventory/:start/:end/:num', function(req, res, next) {
 /**
  * Librarian Tool: Book Display Planner
  */
-router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', function(req, res, next) {
+router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', cacheMiddleware(3000), function(req, res, next) {
   const list = req.params.list;
   const numTimes = req.params.numTimes;
   const year = req.params.year;
@@ -349,7 +371,7 @@ router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', function(req, res, 
  *
  * Examples: harry potter and the , girl with the dragon tattoo, hunger games, alchemist, fault in our stars, kite runner
  */
-router.get('/bookbackground/:title', function(req, res, next) {
+router.get('/bookbackground/:title', cacheMiddleware(3000), function(req, res, next) {
     const title = req.params.title;
 
     console.log("Book background params: "+title);
@@ -457,7 +479,7 @@ router.get('/bookbackground/:title', function(req, res, next) {
  * Librarian Dashboard - Book People Are Not Borrowing
  *
  */
-router.get('/notreadbooks/:year', function(req, res, next) {
+router.get('/notreadbooks/:year', cacheMiddleware(3000), function(req, res, next) {
     const year = req.params.year;
 
     console.log("Not Read books params: "+year);
@@ -531,7 +553,7 @@ router.get('/notreadbooks/:year', function(req, res, next) {
  /*
   * Reader Tool: Great Books You've Never Heard Of
  */
-router.get('/greatbooks/:genre/:num', function(req, res, next) {
+router.get('/greatbooks/:genre/:num', cacheMiddleware(3000), function(req, res, next) {
   const genre = req.params.genre;
   const num = req.params.num;
 
@@ -608,7 +630,7 @@ router.get('/greatbooks/:genre/:num', function(req, res, next) {
 /**
  * Recommendations
  */
-router.get('/recommendations/:title/:num', function(req, res, next) {
+router.get('/recommendations/:title/:num', cacheMiddleware(3000), function(req, res, next) {
   const titleInput = `%${req.params.title.toUpperCase()}%`;
   const numTitles = req.params.num;
 
