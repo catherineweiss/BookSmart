@@ -74,11 +74,10 @@ class DisplayPlanner extends Component {
                 <Container>
                 <HeaderSub />
                     <h3 className="title">Book Display Planner</h3>                        
-                    <div>Fresh out of ideas for your new library display? How about creating your next selection</div>
-                    <div>from bestselling authors? With the Book Display Planner, you can specify a genre and the minimum</div>
-                    <div>number of times an author has had a book appearing on a New York Times bestseller list. </div>
-                    <div>BookSmart will return a list of books by those authors and sort the titles by book borrowing</div>
-                    <div>frequency. All the time you save in planning will be spent restocking your popular display!</div>
+                    <div>Fresh out of ideas for your new library display? How about creating your next selection from bestselling authors? With the Book Display Planner,
+                        you can specify a genre and the minimum number of times an author has had a book appearing on a New York Times bestseller list. BookSmart will
+                        return a list of books by those authors and sort the titles by book borrowing frequency. All the time you save in planning will be spent restocking
+                        your popular display!</div>
                     <div className="space-50"></div>
                     <Row id="inputs-to-display">
                         <Col md="12">

@@ -102,11 +102,8 @@ class InventoryManager extends Component {
                 <Container>
                 <HeaderSub />
                     <h3 className="title">Inventory Manager</h3>                      
-                    <div>Does your library have enough copies of popular reads? </div>
-                    <div>Should copies of the most-borrowed books be replaced? </div>
-                    <div>This tool will rank the most borrowed books for a period of time  </div>
-                    <div>that you choose and display the inventory count for each title.</div>
-                    <div className="space-50"></div>
+                    <div>Does your library have enough copies of popular reads? Should copies of the most-borrowed books be replaced? This tool will rank the most borrowed
+                        books for a period of time that you choose and display the inventory count for each title.</div>
                     <Row id="inventory">
                         <Col md="12">
                             <Row id="inventory-date">
