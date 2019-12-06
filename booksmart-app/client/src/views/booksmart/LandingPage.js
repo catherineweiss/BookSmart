@@ -18,7 +18,7 @@ function LandingPage() {
                 <div className="section section-about-us">
                     <Container>
                         <Row>
-                            <Col className="ml-auto mr-auto text-center" md="5">
+                            <Col className="ml-auto mr-auto text-center" md="10">
                                 <h2 className="title">What is BookSmart?</h2>
                                 <h5 className="description">
                                 Helping readers and librarians understand patterns and trends 
@@ -28,7 +28,7 @@ function LandingPage() {
                         </Row>
 
                         <Row>
-                            <Col className="ml-auto mr-auto text-center" md="6">
+                            <Col className="ml-auto mr-auto text-center" md="8">
                                 <h2 className="title">BookSmart Features</h2>
                                 <h5 className="description">
                                 Are you a librarian? BookSmart provides access to tools designed 
@@ -59,9 +59,9 @@ function LandingPage() {
                                         }}
                                     >
                                         <p className="blockquote blockquote-info">
-                                            "There is no friend as loyal as a book." <br></br>
+                                            "If you only read the books that everyone else is reading, you can only think what everyone else is thinking." <br></br>
                                             <br></br>
-                                            <small>-Ernest Hemingway</small>
+                                            <small>-Haruki Murakami</small>
                                         </p>
                                     </div>
                                 </Col>
@@ -112,17 +112,16 @@ function LandingPage() {
                     </Container>
                 </div>
                 <Row>
-                            <Col className="ml-auto mr-auto text-center" md="6">
-                                <h2 className="title">About Our Dataset</h2>
-                                <h5 className="description">
-                                Booksmart relies on three datasets for information: The New York Times Books API 
-                                for information about book sales, the Goodreads API for information about ratings 
-                                and reviews, and Seattle Public Library Checkout Records for information about 
-                                checkouts from a major public library system. In BookSmart v1.0, data is limited to 
-                                bestseller and library checkout information from 2013 to 2017.  
-                                </h5>
-                            </Col>
-                        </Row>
+                    <Col className="ml-auto mr-auto text-center" md="10">
+                        <div className="copyright">
+                            BookSmart relies on three datasets for information: The New York Times Books API
+                            for information about book sales, the Goodreads API for information about ratings
+                            and reviews, and Seattle Public Library Checkout Records for information about
+                            checkouts from a major public library system. In BookSmart v1.0, data is limited to
+                            bestseller and library checkout information from 2013 to 2017.
+                        </div>
+                    </Col>
+                </Row>
             </div>
         </>
     );
