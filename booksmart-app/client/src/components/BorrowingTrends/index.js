@@ -1,7 +1,9 @@
 import React, { Component } from "react";
-import C3Chart from 'react-c3js';
+import { Spinner } from 'reactstrap';
 import lodash from 'lodash';
 import 'c3/c3.css';
+
+import BorrowingTrendsGraph from "components/BorrowingTrendsGraph";
 
 class BorrowingTrends extends Component {
     constructor(props) {
@@ -23,33 +25,30 @@ class BorrowingTrends extends Component {
     chartifyCheckoutsData(data) {
       // Group records by ISBN
       var dataByIsbn = lodash.groupBy(data, 'ISBN');
-      var yearData = [];
-      var checkoutsData = [];
-      // console.log(dataByIsbn);
+      let borrowingTrends = {}
 
-      for(let key in dataByIsbn) {
+      for (let key in dataByIsbn) {
           const value = dataByIsbn[key];
-          let checkoutsDataPerTitle = [];
-          checkoutsDataPerTitle.push(value[0].TITLE);
-          // console.log(checkoutsDataPerTitle)
+          const title = value[0].TITLE;
+          let x_axis = [];
+          let checkouts = []
           for (let i in value) {
             let record = value[i];
+
+            // build x-axis of dates
             let month;
             if (record.MONTH < 10) {
               month = '0' + record.MONTH.toString();
             } else {
               month = record.MONTH.toString();
             }
-            var dataRecord = record.YEAR.toString()+'-'+month+'-01';
-            // var date = new Date(dataRecord);
-            yearData.push(dataRecord);
-            checkoutsDataPerTitle.push(record.CHECKOUTS_PER_MONTH);
-          }
-          checkoutsData.push(checkoutsDataPerTitle)
+            let date = `${record.YEAR.toString()}-${month}-01`;
+            x_axis.push(date);
 
-          yearData = lodash.uniq(yearData).sort()
-          yearData = ['x', ...yearData]
-          var borrowingTrends = {yearData, checkoutsData};
+            // collect checkout data
+            checkouts.push(record.CHECKOUTS_PER_MONTH);
+          }
+          borrowingTrends[key] = { 'title': title, 'x_axis': x_axis, 'data': checkouts }
       }
       return borrowingTrends;
     }
@@ -99,39 +98,17 @@ class BorrowingTrends extends Component {
 
     render() {
         let borrowingTrends = this.state.borrowingTrends;
-        let borrowingTrendsChart;
-        console.log(borrowingTrends);
-        //creates the borrowingtrends graph
-        let columnData = [];
-          if (this.state.loading) {
-            borrowingTrendsChart = <div>oh hello!</div>
-          } else {
-            columnData.push(borrowingTrends.yearData);
-            for (let i in borrowingTrends.checkoutsData) {
-              columnData.push(borrowingTrends.checkoutsData[i])
-            }
-            console.log(columnData);
-            const data = {
-                x: 'x',
-                xFormat: '%Y-%m-%d',
-                columns: columnData
-            };
-            const axis = {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        format: '%Y-%m-%d'
-                    }
-                }
-            };
-            borrowingTrendsChart = <C3Chart data={data} axis={axis}/>
-          }
-          return (
-            <div>
-              {borrowingTrendsChart}
-            </div>
-          );
-       }
+        let borrowingTrendsChart =
+          <Spinner style={{ width: '3rem', height: '3rem', marginLeft: '48%', marginTop: '20%' }} />
+        if (!this.state.loading) {
+          borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends}/>
+        }
+        return (
+          <div>
+            {borrowingTrendsChart}
+          </div>
+        );
+      }
     }
 
 
