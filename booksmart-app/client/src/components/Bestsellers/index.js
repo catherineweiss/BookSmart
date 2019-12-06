@@ -6,6 +6,7 @@ import {
     Col
 } from "reactstrap";
 import CustomNumOfRowsDropdown from "components/CustomNumOfRowsDropdown";
+import HeaderSub from "components/HeaderSub";
 import ListDropdown from "components/ListDropdown";
 
 
@@ -54,9 +55,15 @@ class Bestsellers extends Component {
         return (
           <div>
               <Container>
+                <HeaderSub />
                 <h3 className="title">Bestsellers</h3>
+                <div>Pick your favorite genre, and let us tally the ranks of the New York Times bestseller list  </div>
+                <div>  to find the all-time longest-standing bestsellers, along with a description of each book and  </div>
+                <div>  how long it was on the list. Helpful to Readers and Librarians alike! </div>
+                <div className="space-50"></div>
                 <Row id="bestsellers">
                   <Col md={leftWidth}>
+
                     <Row>
                         <Col>
                             <div>

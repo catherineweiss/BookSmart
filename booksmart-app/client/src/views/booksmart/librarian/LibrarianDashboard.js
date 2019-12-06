@@ -2,13 +2,20 @@ import React from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
 import {Button, Col, Container, Row} from "reactstrap";
+import HeaderMain from "components/HeaderMain";
 
 // core components
 
 function LibrarianDashboard() {
     return (
         <>
+            <div data-background-color="black">
+                <Container>
+                    <HeaderMain />
+                </Container>
+            </div>
             <div className="section section-examples" data-background-color="black">
+
                 <Container className="text-center">
                     <Row>
                         <Col md="4">

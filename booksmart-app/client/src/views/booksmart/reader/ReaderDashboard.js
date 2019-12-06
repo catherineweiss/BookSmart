@@ -2,12 +2,18 @@ import React from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
 import {Button, Col, Container, Row} from "reactstrap";
+import HeaderMain from "components/HeaderMain";
 
 // core components
 
 function ReaderDashboard() {
     return (
         <>
+            <div data-background-color="black">
+                <Container>
+                    <HeaderMain />
+                </Container>
+            </div>
             <div className="section section-examples" data-background-color="black">
                 <div className="space-50"></div>
                 <Container className="text-center">

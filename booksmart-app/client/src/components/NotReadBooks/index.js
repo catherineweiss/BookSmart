@@ -7,6 +7,7 @@ import {
     Row,
     Col
 } from "reactstrap";
+import HeaderSub from "components/HeaderSub";
 import YearDropdown from "components/YearDropdown";
 
 class NotReadBooks extends Component {
@@ -88,7 +89,14 @@ class NotReadBooks extends Component {
         return (
             <div>
                 <Container>
+                    <HeaderSub />
                     <h3 className="title">What People Are Not Reading</h3>
+                    <div>Shelves overflowing and needing to weed out? You pick the year of interest and BookSmart will</div>
+                    <div>provide a random selection of titles that have not been borrowed a single time during that year.</div>
+                    <div> This tool is a must-have to get ready for your library’s next used book sale! ISBN and genre </div>
+                    <div>information is provided for convenience.</div>
+                    <div className="space-50"></div>
+
                     <Row id="notReadBooks">
                         <Col md="12">
                             <Row id="input">
