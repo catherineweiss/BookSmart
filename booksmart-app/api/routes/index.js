@@ -757,9 +757,7 @@ router.get('/addtofavorites/:title([^/]+/[^/]+)', function(req, res, next) {
     if (IPs.indexOf(":") !== -1) {
         IPs = IPs.split(":")[IPs.split(":").length - 1]
     }
-
     var IP = IPs.split(",")[0];
-
     console.log("IP="+IP);
 
     var table = "BookFavorites";
@@ -803,6 +801,52 @@ router.get('/addtofavorites/:title([^/]+/[^/]+)', function(req, res, next) {
         });
 
     });
+});
+
+/**
+ * Get Favorites - Get Favorite book titles from NoSQL DynamoDB
+ */
+router.get('/favorites', function(req, res, next) {
+
+        console.log("Get from Favorites");
+        var IPs = req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
+
+        if (IPs.indexOf(":") !== -1) {
+            IPs = IPs.split(":")[IPs.split(":").length - 1]
+        }
+        var IP = IPs.split(",")[0];
+        console.log("IP="+IP);
+
+        var table = "BookFavorites";
+        var params = {
+            TableName: table,
+            Key:{
+                "ipAddress": IP
+            }
+        };
+
+        docClient.get(params, function(err, data) {
+            if (err) {
+                console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+                console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+
+                var favoriteBooks = [];
+                var favBookTitles = [];
+                if(data.Item !== undefined && data.Item !== null && data.Item.favorites !== undefined) {
+                    favoriteBooks = data.Item.favorites;
+                    for(book in favoriteBooks) {
+                        favBookTitles.push({TITLE: favoriteBooks[book]});
+                    }
+                }
+
+                return res.json(favBookTitles);
+            }
+        });
+
 });
 
 

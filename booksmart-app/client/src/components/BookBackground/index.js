@@ -23,7 +23,7 @@ class BookBackground extends Component {
         this.callAPI = this.callAPI.bind(this);
         this.onChangeTitle = this.onChangeTitle.bind(this);
         this.addToFavorites = this.addToFavorites.bind(this);
-        this.state = { bookBackground: [], title: '', validTitle: false, error: '' ,showFavoritesNotification: true};
+        this.state = { bookBackground: [], title: '', validTitle: false, error: '' ,showFavoritesNotification: false};
     }
 
     callAPI() {

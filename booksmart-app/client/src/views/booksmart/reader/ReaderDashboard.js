@@ -18,7 +18,7 @@ function ReaderDashboard() {
                 <div className="space-50"></div>
                 <Container className="text-center">
                     <Row>
-                        <Col md="6">
+                        <Col md="4">
                             <Row>
                                 <Col sm="12" md={{ size: 6, offset: 3 }}>
                                     <a href="/book-background" target="_blank">
@@ -44,7 +44,33 @@ function ReaderDashboard() {
                                 </Col>
                             </Row>
                         </Col>
-                        <Col md="6">
+                        <Col md="4">
+                            <Row>
+                                <Col sm="12" md={{ size: 6, offset: 3 }}>
+                                    <a href="/favorites" target="_blank">
+                                        <img
+                                            alt="..."
+                                            className="img-raised reader-dashboard"
+                                            src={require("assets/image/favorites_1.jpg")}
+                                        ></img>
+                                    </a>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col sm="12" md={{ size: 6, offset: 3 }}>
+                                    <Button
+                                        className="btn-round"
+                                        color="default"
+                                        to="/favorites"
+                                        outline
+                                        tag={Link}
+                                    >
+                                        Favorites
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col md="4">
                             <Row>
                                 <Col sm="12" md={{ size: 6, offset: 3 }}>
                                     <a href="/recommendations" target="_blank">
