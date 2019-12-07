@@ -42,7 +42,7 @@ code {
 
 .card-book {
   width: 400px;
-  height: 700px;
+  height: 650px;
 }
 
 .card-title-font {
@@ -53,4 +53,8 @@ code {
 .card-text-font {
   font-size: 90%;
   margin: unset;
+}
+
+.fav-icon {
+
 }

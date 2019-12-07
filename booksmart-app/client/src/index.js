@@ -19,7 +19,8 @@ import DisplayPlannerPage from "views/booksmart/librarian/DisplayPlanner";
 import NotReadBooksPage from "views/booksmart/librarian/NotReadBooks";
 import BookBackgroundPage from "views/booksmart/reader/BookBackground";
 import GreatBooksPage from "views/booksmart/reader/GreatBooks";
-import RecommendationsPage from "views/booksmart/reader/Recommendations"
+import RecommendationsPage from "views/booksmart/reader/Recommendations";
+import FavoritesPage from "views/booksmart/reader/Favorites";
 
 import * as serviceWorker from './serviceWorker';
 
@@ -38,6 +39,7 @@ ReactDOM.render(
                 <Route path="/recommendations" render={props => <RecommendationsPage/>} />
                 <Route path="/examples" render={props => <Index {...props} />} />
                 <Route path="/great-books" render={props => <GreatBooksPage/>} />
+                <Route path="/favorites" render={props => <FavoritesPage/>} />
                 <Redirect to="/index" />
                 <Redirect from="/" to="/index" />
             </Switch>
