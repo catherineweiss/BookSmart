@@ -1,9 +1,15 @@
 import React, { Component } from "react";
-import { Spinner } from 'reactstrap';
+import {
+  Button,
+  Container,
+  FormGroup,
+  Input
+} from 'reactstrap';
 import lodash from 'lodash';
 import 'c3/c3.css';
 
 import BorrowingTrendsGraph from "components/BorrowingTrendsGraph";
+import HeaderSub from "components/HeaderSub";
 
 class BorrowingTrends extends Component {
     constructor(props) {
@@ -12,24 +18,23 @@ class BorrowingTrends extends Component {
         this.callRankingsAPI = this.callRankingsAPI.bind(this);
         this.callAPIs = this.callAPIs.bind(this);
         this.chartifyCheckoutsData = this.chartifyCheckoutsData.bind(this);
+        this.chartifyRankingsData = this.chartifyRankingsData.bind(this);
         this.onChangeTitle = this.onChangeTitle.bind(this);
         this.state = { borrowingTrends: {},
-                        rankingTrends: [],
-                        title: 'harry potter and the sorcerer',
+                        rankingTrends: {},
+                        title: '',
                         validTitle: false,
-                        loading: true,
                         error: '' };
-        this.callAPIs();
     }
 
     chartifyCheckoutsData(data) {
       // Group records by ISBN
       var dataByIsbn = lodash.groupBy(data, 'ISBN');
       let borrowingTrends = {}
-
       for (let key in dataByIsbn) {
-          const value = dataByIsbn[key];
-          const title = value[0].TITLE;
+        const value = dataByIsbn[key];
+        const title = value[0].TITLE;
+        if (!(title in borrowingTrends)) {
           let x_axis = [];
           let checkouts = []
           for (let i in value) {
@@ -48,9 +53,40 @@ class BorrowingTrends extends Component {
             // collect checkout data
             checkouts.push(record.CHECKOUTS_PER_MONTH);
           }
-          borrowingTrends[key] = { 'title': title, 'x_axis': x_axis, 'data': checkouts }
+          borrowingTrends[title] = { 'title': title, 'x_axis': x_axis, 'data': checkouts }
+        }
       }
       return borrowingTrends;
+    }
+
+    chartifyRankingsData(data) {
+      // Group records by ISBN
+      var dataByIsbn = lodash.groupBy(data, 'ISBN');
+      let rankings = {}
+      for (let key in dataByIsbn) {
+        let values = dataByIsbn[key]; // array of rankings
+        const title = values[0].TITLE;
+        if (!(title in rankings)) {
+          let x_axis = []
+          let ranks = []
+          for (let i in values) {
+
+            // build x-axis of dates
+            const dateInfo = values[i].BESTSELLERS_DATE.split("-")
+            const year = dateInfo[0]
+            const month = dateInfo[1]
+            const day = dateInfo[2].substr(0,2)
+            const date = `${year}-${month}-${day}`
+            x_axis.push(date);
+
+            // collect rankings
+            const weeklyRank = values[i].RANK
+            ranks.push(weeklyRank);
+          }
+          rankings[title] = { 'title': title, 'x_axis': x_axis, 'data': ranks }
+        }
+      }
+      return rankings;
     }
 
     callCheckoutsAPI() {
@@ -62,19 +98,21 @@ class BorrowingTrends extends Component {
             .then(data => {
                 // console.log(data);
                 data = this.chartifyCheckoutsData(data);
-                this.setState({ borrowingTrends: data, loading: false });
+                this.setState({ borrowingTrends: data });
             })
             .catch(err => err);
     }
 
     callRankingsAPI() {
         const title = this.state.title;
-        // console.log(title);
         const url = "/nytrank/" + title;
 
         fetch(url)
             .then(res => res.json())
-            .then(data => this.setState({ borrowingTrends: data }))
+            .then(data => {
+              data = this.chartifyRankingsData(data);
+              this.setState({ rankingTrends: data });
+            })
             .catch(err => err);
     }
 
@@ -98,14 +136,47 @@ class BorrowingTrends extends Component {
 
     render() {
         let borrowingTrends = this.state.borrowingTrends;
-        let borrowingTrendsChart =
-          <Spinner style={{ width: '3rem', height: '3rem', marginLeft: '48%', marginTop: '20%' }} />
-        if (!this.state.loading) {
-          borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends}/>
-        }
+        let rankingTrends = this.state.rankingTrends;
+
+        let borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends}/>
+        let rankingsChart = <BorrowingTrendsGraph data={rankingTrends}/>
+
         return (
           <div>
-            {borrowingTrendsChart}
+            <Container>
+              <HeaderSub />
+              <h3 className="title">Borrowing Trends</h3>
+              <div>
+                When a new bestseller hits the list, should libraries automatically stock up on copies?
+                Or are borrowing trends and bestseller trends not closely correlated?
+                Librarians can make sense of this with the help of the Borrowing Trends feature.
+                For a user-defined book title, BookSmart presents a graphical display of checkouts per month over time.
+                If the book was a bestseller, the rank on the list will also be plotted over time.
+                The Goodreads average rating and rating count for the title will be provided if available.
+              </div>
+              <div className="space-50"></div>
+              <FormGroup>
+                  <Input
+                      placeholder="Book Title"
+                      type="text"
+                      value={this.state.title}
+                      onChange={this.onChangeTitle}
+                  ></Input>
+                  <span style={{color: "red"}}>{this.state.error}</span>
+              </FormGroup>
+              <div>
+                  <Button
+                      className="btn-round"
+                      color="primary"
+                      href="#"
+                      onClick={this.callAPIs}
+                      >Search</Button>
+              </div>
+              <h4>Checkouts Over Time</h4>
+              {borrowingTrendsChart}
+              <h4>New York Times Rankings</h4>
+              {rankingsChart}
+            </Container>
           </div>
         );
       }

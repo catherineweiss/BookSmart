@@ -557,7 +557,7 @@ router.get('/notreadbooks/:year', cacheMiddleware(3000), function(req, res, next
 
     init(year).then(result => res.json(result));
   });
- 
+
  /*
   * Reader Tool: Great Books You've Never Heard Of
  */
@@ -974,7 +974,7 @@ router.get('/nytrank/:title', function(req, res, next) {
                 FROM LIBRARYBOOK LB JOIN LIBRARYISBN LI
                   ON LB.BIB_NUM = LI.BIB_NUM
                   AND LI.ISBN_TYPE = 'ISBN13'
-                  AND lower(LB.TITLE) like 'harry potter and the sorcerer%'
+                  AND lower(LB.TITLE) like :title
                 JOIN NYT_BOOK NB
                   ON NB.ISBN13 = LI.ISBN
                 LEFT JOIN NYT_BOOK_LIST NBL

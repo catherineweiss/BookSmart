@@ -10,7 +10,6 @@ class BorrowingTrendsGraph extends Component {
     let x_axes = []
     let data_arrays = []
     const trends = this.props.data;
-
     let count = 1;
     for (let key in trends) {
       const item = trends[key];
