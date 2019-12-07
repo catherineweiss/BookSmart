@@ -2,6 +2,14 @@ var express = require('express');
 var router = express.Router();
 var config = require('../db-config.js');
 
+// AWS DynamoDB
+var AWS = require('aws-sdk');
+// Set the AWS configuration
+AWS.config.loadFromPath('./config.json');
+
+// Create the DynamoDB service object
+var docClient = new AWS.DynamoDB.DocumentClient();
+
 // Caching
 var cache = require('memory-cache');
 
@@ -732,6 +740,69 @@ router.get('/recommendations/:title/:num', cacheMiddleware(3000), function(req, 
 
   init(titleInput, numTitles).then(result => res.json(result));
 
+});
+
+/**
+ * Add to Favorites - Add Favorite book titles to NoSQL DynamoDB
+ */
+router.get('/addtofavorites/:title([^/]+/[^/]+)', function(req, res, next) {
+    const title = req.params.title;
+
+    console.log("Add to Favorites:"+title);
+    var IPs = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    if (IPs.indexOf(":") !== -1) {
+        IPs = IPs.split(":")[IPs.split(":").length - 1]
+    }
+
+    var IP = IPs.split(",")[0];
+
+    console.log("IP="+IP);
+
+    var table = "BookFavorites";
+    var params = {
+        TableName: table,
+        Key:{
+            "ipAddress": IP
+        }
+    };
+
+    docClient.get(params, function(err, data) {
+        if (err) {
+            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
+            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+        }
+
+        var favoriteBooks = [];
+        if(data.Item !== undefined && data.Item !== null && data.Item.favorites !== undefined) {
+            favoriteBooks = data.Item.favorites;
+        }
+        favoriteBooks.push(title);
+
+        var favorites = Array.from(new Set(favoriteBooks));
+        var inputParams = {
+            TableName:table,
+            Item:{
+                "ipAddress": IP,
+                "favorites": favorites,
+            }
+        };
+
+        console.log("Adding a new item...");
+        docClient.put(inputParams, function(err, data) {
+            if (err) {
+                console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+                console.log("Added item:", JSON.stringify(data, null, 2));
+            }
+            return res.json(data);
+        });
+
+    });
 });
 
 
