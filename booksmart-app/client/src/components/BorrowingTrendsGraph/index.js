@@ -1,7 +1,9 @@
 import React, { Component } from "react";
+import { findDOMNode } from 'react-dom';
 import C3Chart from 'react-c3js';
 import 'c3/c3.css';
 
+let c3 = require('c3');
 
 class BorrowingTrendsGraph extends Component {
   render() {
@@ -32,7 +34,8 @@ class BorrowingTrendsGraph extends Component {
 
     data = {
       xs: { ...xs },
-      columns: [...columns]
+      columns: [...columns],
+      unload: true
     };
 
     let axis = {
@@ -44,8 +47,11 @@ class BorrowingTrendsGraph extends Component {
         }
     };
 
+    // let node = findDOMNode(this);
+    // let chart = c3.generate({ bindto: node, data, axis})
+
     return (
-      <div>
+      <div id={this.props.node}>
         <C3Chart data={data} axis={axis}/>
       </div>
     );

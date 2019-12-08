@@ -129,8 +129,8 @@ class BorrowingTrends extends Component {
         let borrowingTrends = this.state.borrowingTrends;
         let rankingTrends = this.state.rankingTrends;
 
-        let borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends}/>;
-        let rankingsChart = <BorrowingTrendsGraph data={rankingTrends}/>;
+        let borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends} node="#checkouts"/>;
+        let rankingsChart = <BorrowingTrendsGraph data={rankingTrends} node="#rankings"/>;
 
         return (
           <div>
