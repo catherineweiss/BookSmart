@@ -14,8 +14,6 @@ import HeaderSub from "components/HeaderSub";
 class BorrowingTrends extends Component {
     constructor(props) {
         super(props);
-        this.callCheckoutsAPI = this.callCheckoutsAPI.bind(this);
-        this.callRankingsAPI = this.callRankingsAPI.bind(this);
         this.callAPIs = this.callAPIs.bind(this);
         this.chartifyCheckoutsData = this.chartifyCheckoutsData.bind(this);
         this.chartifyRankingsData = this.chartifyRankingsData.bind(this);
@@ -30,13 +28,13 @@ class BorrowingTrends extends Component {
     chartifyCheckoutsData(data) {
       // Group records by ISBN
       var dataByIsbn = lodash.groupBy(data, 'ISBN');
-      let borrowingTrends = {}
+      let borrowingTrends = {};
       for (let key in dataByIsbn) {
         const value = dataByIsbn[key];
         const title = value[0].TITLE;
         if (!(title in borrowingTrends)) {
           let x_axis = [];
-          let checkouts = []
+          let checkouts = [];
           for (let i in value) {
             let record = value[i];
 
@@ -62,63 +60,56 @@ class BorrowingTrends extends Component {
     chartifyRankingsData(data) {
       // Group records by ISBN
       var dataByIsbn = lodash.groupBy(data, 'ISBN');
-      let rankings = {}
+      let rankings = {};
       for (let key in dataByIsbn) {
         let values = dataByIsbn[key]; // array of rankings
         const title = values[0].TITLE;
         if (!(title in rankings)) {
-          let x_axis = []
-          let ranks = []
+          let x_axis = [];
+          let ranks = [];
           for (let i in values) {
 
             // build x-axis of dates
-            const dateInfo = values[i].BESTSELLERS_DATE.split("-")
-            const year = dateInfo[0]
-            const month = dateInfo[1]
-            const day = dateInfo[2].substr(0,2)
-            const date = `${year}-${month}-${day}`
+            const dateInfo = values[i].BESTSELLERS_DATE.split("-");
+            const year = dateInfo[0];
+            const month = dateInfo[1];
+            const day = dateInfo[2].substr(0,2);
+            const date = `${year}-${month}-${day}`;
             x_axis.push(date);
 
             // collect rankings
-            const weeklyRank = values[i].RANK
+            const weeklyRank = values[i].RANK;
             ranks.push(weeklyRank);
           }
-          rankings[title] = { 'title': title, 'x_axis': x_axis, 'data': ranks }
+          rankings[title] = { 'title': title, 'x_axis': x_axis, 'data': ranks };
         }
       }
       return rankings;
     }
 
-    callCheckoutsAPI() {
+    callAPIs() {
         const title = this.state.title;
         // console.log(title);
-        const url = "/borrowingtrends/" + title;
-        fetch(url)
+        const btUrl = "/borrowingtrends/" + title;
+        const nytUrl = "/nytrank/" + title;
+
+        fetch(btUrl)
             .then(res => res.json())
             .then(data => {
-                // console.log(data);
+                 console.log(data);
                 data = this.chartifyCheckoutsData(data);
                 this.setState({ borrowingTrends: data });
-            })
+            }).then(() => {
+            fetch(nytUrl)
+                .then(res => res.json())
+                .then(data => {
+                    data = this.chartifyRankingsData(data);
+                    this.setState({ rankingTrends: data });
+                })
+                .catch(err => err);
+        })
             .catch(err => err);
-    }
 
-    callRankingsAPI() {
-        const title = this.state.title;
-        const url = "/nytrank/" + title;
-
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-              data = this.chartifyRankingsData(data);
-              this.setState({ rankingTrends: data });
-            })
-            .catch(err => err);
-    }
-
-    callAPIs() {
-        this.callCheckoutsAPI();
-        this.callRankingsAPI();
     }
 
 
@@ -138,8 +129,8 @@ class BorrowingTrends extends Component {
         let borrowingTrends = this.state.borrowingTrends;
         let rankingTrends = this.state.rankingTrends;
 
-        let borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends}/>
-        let rankingsChart = <BorrowingTrendsGraph data={rankingTrends}/>
+        let borrowingTrendsChart = <BorrowingTrendsGraph data={borrowingTrends}/>;
+        let rankingsChart = <BorrowingTrendsGraph data={rankingTrends}/>;
 
         return (
           <div>
