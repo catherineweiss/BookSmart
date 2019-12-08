@@ -856,7 +856,7 @@ router.get('/favorites', function(req, res, next) {
  * Then graphs the data shown
  *
  */
-router.get('/borrowingtrends/:title', function(req, res, next) {
+router.get('/borrowingtrends/:title', cacheMiddleware(3000),function(req, res, next) {
     const title = req.params.title;
 
     console.log("Borrowing Trends params: "+title);
@@ -935,7 +935,7 @@ router.get('/borrowingtrends/:title', function(req, res, next) {
 });
 
 
-router.get('/nytrank/:title', function(req, res, next) {
+router.get('/nytrank/:title', cacheMiddleware(3000),function(req, res, next) {
     const title = req.params.title;
 
     console.log("NYT Rank params: "+title);
