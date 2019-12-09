@@ -5,12 +5,10 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 // styles
 import "assets/css/bootstrap.min.css";
 import "assets/css/now-ui-kit.css";
-import "assets/demo/demo.css";
 
 import 'index.css';
 
 import LandingPage from "views/booksmart/LandingPage.js";
-import Index from "views/Index.js";
 import LibrarianDashboard from "views/booksmart/librarian/LibrarianDashboard"
 import ReaderDashboard from "views/booksmart/reader/ReaderDashboard";
 import BestsellersPage from "views/booksmart/Bestsellers"
@@ -38,7 +36,6 @@ ReactDOM.render(
                 <Route path="/book-background" render={props => <BookBackgroundPage/>} />
                 <Route path="/bestsellers" render={props => <BestsellersPage/>} />
                 <Route path="/recommendations" render={props => <RecommendationsPage/>} />
-                <Route path="/examples" render={props => <Index {...props} />} />
                 <Route path="/great-books" render={props => <GreatBooksPage/>} />
                 <Route path="/favorites" render={props => <FavoritesPage/>} />
                 <Route path="/borrowing-trends" render={props => <BorrowingTrendsPage/>} />
