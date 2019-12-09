@@ -2,17 +2,21 @@ var express = require('express');
 var router = express.Router();
 var config = require('../db-config.js');
 
-// AWS DynamoDB
+/**
+ * AWS DynamoDB - NoSQL DB
+ *
+ */
 var AWS = require('aws-sdk');
 // Set the AWS configuration
 AWS.config.loadFromPath('./config.json');
-
 // Create the DynamoDB service object
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-// Caching
+/**
+ * In Memory Caching Middleware
+ *
+ */
 var cache = require('memory-cache');
-
 // configure cache middleware
 let memCache = new cache.Cache();
 let cacheMiddleware = (duration) => {
@@ -32,8 +36,10 @@ let cacheMiddleware = (duration) => {
     }
 };
 
-/* ----- Connects to Booksmart Oracle database ----- */
-
+/**
+ * Oracle DB - AWS RDS Instance
+ * @type {OracleDb}
+ */
 const oracledb = require('oracledb');
 
 async function closePool() {
@@ -66,7 +72,7 @@ process
   .once('SIGINT',  closePoolAndExit);
 
 /* ------------------------------------------------ */
-/* ----- Routers to handle data requests ----- */
+/* ----- Routers to handle data requests ---------- */
 /* ------------------------------------------------ */
 
 /* GET home page. */
@@ -100,6 +106,12 @@ router.get('/bestsellers/:list/:num', cacheMiddleware(3000), function(req, res, 
     }
   };
 
+    /**
+     * Get list of best sellers, given list name and number of results to return
+     * @param list
+     * @param num
+     * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+     */
   async function getBestsellers (list, num) {
     let conn;
 
@@ -147,6 +159,9 @@ router.get('/bestsellers/:list/:num', cacheMiddleware(3000), function(req, res, 
 
 });
 
+/**
+ * Get list names for the best sellers
+ */
 router.get('/bestsellers/getlists', cacheMiddleware(3000), function(req, res, next) {
 
   async function init() {
@@ -168,6 +183,10 @@ router.get('/bestsellers/getlists', cacheMiddleware(3000), function(req, res, ne
     }
   };
 
+    /**
+     * Get List names from New York Times data
+     * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+     */
   async function getNYTimesLists () {
     let conn;
 
@@ -200,7 +219,7 @@ router.get('/bestsellers/getlists', cacheMiddleware(3000), function(req, res, ne
 
 
 /**
- * Inventory Manager
+ * Inventory Manager Feature
  */
 router.get('/inventory/:start/:end/:num', cacheMiddleware(3000), function(req, res, next) {
     const start = req.params.start;
@@ -228,7 +247,14 @@ router.get('/inventory/:start/:end/:num', cacheMiddleware(3000), function(req, r
         }
     };
 
-    async function getInventory (startDate, endDate, num) {
+/**
+ * Get library inventory information based on Checkout Date range and number of results to return
+ * @param startDate
+ * @param endDate
+ * @param num
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getInventory (startDate, endDate, num) {
         let conn;
 
         try {
@@ -281,7 +307,7 @@ router.get('/inventory/:start/:end/:num', cacheMiddleware(3000), function(req, r
 });
 
 /**
- * Librarian Tool: Book Display Planner
+ * Librarian Tool: Book Display Planner - Feature
  */
 router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', cacheMiddleware(3000), function(req, res, next) {
   const list = req.params.list;
@@ -310,7 +336,16 @@ router.get('/bookdisplay/:list/:numTimes/:year/:numDisplay', cacheMiddleware(300
       }
   };
 
-  async function getBooksToDisplay (list, numTimes, year, numDisplay) {
+/**
+ *  Get information about the books to display, given the genre, number of times the book appears in
+ *  the best seller list, the year and the number of results to display
+ * @param list
+ * @param numTimes
+ * @param year
+ * @param numDisplay
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getBooksToDisplay (list, numTimes, year, numDisplay) {
       let conn;
 
       try {
@@ -408,7 +443,12 @@ router.get('/bookbackground/:title', cacheMiddleware(3000), function(req, res, n
         }
     };
 
-    async function getBookBackground (title) {
+/**
+ * Get background information about books that match a user inputted title
+ * @param title
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getBookBackground (title) {
         let conn;
 
         try {
@@ -484,7 +524,7 @@ router.get('/bookbackground/:title', cacheMiddleware(3000), function(req, res, n
 });
 
 /**
- * Librarian Dashboard - Book People Are Not Borrowing
+ * Librarian Dashboard - Book People Are Not Borrowing - Feature
  *
  */
 router.get('/notreadbooks/:year', cacheMiddleware(3000), function(req, res, next) {
@@ -511,7 +551,13 @@ router.get('/notreadbooks/:year', cacheMiddleware(3000), function(req, res, next
         }
     };
 
-    async function getNeverReadBooks (year) {
+/**
+ * Get a list of 25 books that were the least read per year, from the library dataset
+ * This is generated randomly in order to make the feature interesting
+ * @param year
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getNeverReadBooks (year) {
         let conn;
 
         try {
@@ -559,7 +605,7 @@ router.get('/notreadbooks/:year', cacheMiddleware(3000), function(req, res, next
   });
 
  /*
-  * Reader Tool: Great Books You've Never Heard Of
+  * Reader Tool: Great Books You've Never Heard Of - Feature
  */
 router.get('/greatbooks/:genre/:num', cacheMiddleware(3000), function(req, res, next) {
   const genre = req.params.genre;
@@ -586,7 +632,13 @@ router.get('/greatbooks/:genre/:num', cacheMiddleware(3000), function(req, res, 
       }
   };
 
-  async function getGreatBooks (genre, num) {
+/**
+ * Get book titles from the library dataset, which did not appear on the best seller list
+ * @param genre
+ * @param num
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getGreatBooks (genre, num) {
       let conn;
 
       try {
@@ -636,7 +688,7 @@ router.get('/greatbooks/:genre/:num', cacheMiddleware(3000), function(req, res, 
 });
 
 /**
- * Recommendations
+ * Recommendations - Feature
  */
 router.get('/recommendations/:title/:num', cacheMiddleware(3000), function(req, res, next) {
   const titleInput = `%${req.params.title.toUpperCase()}%`;
@@ -661,7 +713,15 @@ router.get('/recommendations/:title/:num', cacheMiddleware(3000), function(req, 
     }
   };
 
-  async function getRecommendations (titleInput, numTitles) {
+/**
+ * Get book recommendations given a book title and the number of results to return.
+ * The recommended books should share the same genre as the book that was input and
+ * have at least a similar Good Reads rating.
+ * @param titleInput
+ * @param numTitles
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getRecommendations (titleInput, numTitles) {
     let conn;
     try {
       conn = await oracledb.getConnection();
@@ -885,7 +945,12 @@ router.get('/borrowingtrends/:title', cacheMiddleware(3000),function(req, res, n
         }
     };
 
-    async function getBorrowingTrends (title) {
+/**
+ * Get checkout information based on the title that was input
+ * @param title
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getBorrowingTrends (title) {
         let conn;
 
         try {
@@ -934,7 +999,9 @@ router.get('/borrowingtrends/:title', cacheMiddleware(3000),function(req, res, n
     init(title).then(result => res.json(result));
 });
 
-
+/**
+ * New York Times Best Sellers - Rank
+ */
 router.get('/nytrank/:title', cacheMiddleware(3000),function(req, res, next) {
     const title = req.params.title;
 
@@ -964,7 +1031,12 @@ router.get('/nytrank/:title', cacheMiddleware(3000),function(req, res, next) {
         }
     };
 
-    async function getNYTRank (title) {
+/***
+ * Get New York Times Bestseller ranks, given a title
+ * @param title
+ * @returns {Promise<SQLResultSetRowList|number|HTMLCollectionOf<HTMLTableRowElement>|string>}
+ */
+async function getNYTRank (title) {
         let conn;
 
         try {
