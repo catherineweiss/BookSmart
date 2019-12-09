@@ -29,10 +29,11 @@ class BorrowingTrends extends Component {
       // Group records by ISBN
       var dataByIsbn = lodash.groupBy(data, 'ISBN');
       let borrowingTrends = {};
+      let count = 1;
       for (let key in dataByIsbn) {
         const value = dataByIsbn[key];
         const title = value[0].TITLE;
-        if (!(title in borrowingTrends)) {
+        if (!(title in borrowingTrends) && count <= 5) {
           let x_axis = [];
           let checkouts = [];
           for (let i in value) {
@@ -53,6 +54,7 @@ class BorrowingTrends extends Component {
           }
           borrowingTrends[title] = { 'title': title, 'x_axis': x_axis, 'data': checkouts }
         }
+        count++;
       }
       return borrowingTrends;
     }
@@ -61,10 +63,11 @@ class BorrowingTrends extends Component {
       // Group records by ISBN
       var dataByIsbn = lodash.groupBy(data, 'ISBN');
       let rankings = {};
+      let count = 1;
       for (let key in dataByIsbn) {
         let values = dataByIsbn[key]; // array of rankings
         const title = values[0].TITLE;
-        if (!(title in rankings)) {
+        if (!(title in rankings) && count <= 5) {
           let x_axis = [];
           let ranks = [];
           for (let i in values) {
@@ -83,6 +86,7 @@ class BorrowingTrends extends Component {
           }
           rankings[title] = { 'title': title, 'x_axis': x_axis, 'data': ranks };
         }
+        count++;
       }
       return rankings;
     }
